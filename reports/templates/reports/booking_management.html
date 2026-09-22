@@ -1,0 +1,128 @@
+{% extends 'reports/base_admin.html' %}
+
+{% block title %}Manage Bookings{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
+    <h1 class="h2">Manage Bookings</h1>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-white py-3">
+        <form method="get" class="row g-3 align-items-center">
+            <div class="col-md-5">
+                <input type="text" name="q" class="form-control" placeholder="Search by reference, customer name, package..." value="{{ search_query }}">
+            </div>
+            <div class="col-md-4">
+                <select name="status" class="form-select">
+                    <option value="">All Statuses</option>
+                    {% for value, label in status_choices %}
+                        <option value="{{ value }}" {% if current_status == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-search me-2"></i>Filter
+                </button>
+            </div>
+        </form>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped align-middle mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Reference</th>
+                        <th>Date</th>
+                        <th>Customer</th>
+                        <th>Package</th>
+                        <th>Travel Dates</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr>
+                        <td><strong>{{ booking.booking_reference }}</strong></td>
+                        <td>{{ booking.created_at|date:"M d, Y" }}</td>
+                        <td>
+                            <div>{{ booking.customer.get_full_name|default:booking.customer.username }}</div>
+                            <small class="text-muted">{{ booking.customer.email }}</small>
+                        </td>
+                        <td>
+                            <div>{{ booking.package.name }}</div>
+                            <small class="text-muted">{{ booking.package.destination.name }}</small>
+                        </td>
+                        <td>
+                            <div>{{ booking.start_date|date:"M d, Y" }}</div>
+                            <small class="text-muted">to {{ booking.end_date|date:"M d, Y" }}</small>
+                        </td>
+                        <td>₹{{ booking.grand_total|floatformat:2 }}</td>
+                        <td>
+                            {% if booking.status == 'confirmed' %}
+                                <span class="badge bg-success">Confirmed</span>
+                            {% elif booking.status == 'pending' %}
+                                <span class="badge bg-warning text-dark">Pending</span>
+                            {% elif booking.status == 'completed' %}
+                                <span class="badge bg-primary">Completed</span>
+                            {% else %}
+                                <span class="badge bg-danger">Cancelled</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#bookingModal{{ booking.id }}">
+                                Update Status
+                            </button>
+                        </td>
+                    </tr>
+
+                    <!-- Status Update Modal -->
+                    <div class="modal fade" id="bookingModal{{ booking.id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Update Booking Status</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <form method="post" action="{% url 'reports:update_booking_status' booking.id %}">
+                                    {% csrf_token %}
+                                    <div class="modal-body">
+                                        <p><strong>Reference:</strong> {{ booking.booking_reference }}</p>
+                                        <p><strong>Customer:</strong> {{ booking.customer.username }}</p>
+                                        <p><strong>Package:</strong> {{ booking.package.name }}</p>
+                                        <hr>
+                                        <div class="mb-3">
+                                            <label class="form-label">New Status</label>
+                                            <select name="status" class="form-select">
+                                                {% for value, label in status_choices %}
+                                                    <option value="{{ value }}" {% if booking.status == value %}selected{% endif %}>{{ label }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-primary">Save changes</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center py-4">
+                            <div class="text-muted"><i class="fas fa-inbox fa-3x mb-3"></i></div>
+                            <h5>No bookings found</h5>
+                            <p class="text-muted">Try adjusting your search filters.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

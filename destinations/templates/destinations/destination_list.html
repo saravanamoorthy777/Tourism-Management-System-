@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Explore Tourist Destinations | Tourism Management System{% endblock %}
+
+{% block content %}
+<!-- Catalog Hero & Search Bar -->
+<section class="catalog-header-banner">
+  <div class="container position-relative">
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-white-50 text-decoration-none"><i class="fa-solid fa-house-chimney me-1"></i> Home</a></li>
+        <li class="breadcrumb-item active text-white" aria-current="page">Destinations</li>
+      </ol>
+    </nav>
+
+    <div class="row align-items-center gy-3">
+      <div class="col-lg-7">
+        <span class="badge bg-white-10 text-info fw-semibold px-3 py-1 rounded-pill mb-2 border border-white-20" style="background: rgba(255,255,255,0.15);">
+          <i class="fa-solid fa-earth-asia me-1"></i> Destination Catalog
+        </span>
+        <h1 class="text-white fw-bold mb-2">Explore Destinations</h1>
+        <p class="text-white-50 mb-0">
+          Discover incredible tourist destinations across India, categorized by travel themes and packed with customized tour packages.
+        </p>
+      </div>
+
+      <div class="col-lg-5">
+        <!-- Search Form -->
+        <form method="get" action="{% url 'destination_list' %}" class="bg-white p-2 rounded-3 shadow-lg d-flex gap-2">
+          {% if selected_category %}
+            <input type="hidden" name="category" value="{{ selected_category.slug }}">
+          {% endif %}
+          <div class="input-group border-0">
+            <span class="input-group-text bg-transparent border-0 text-muted ps-2"><i class="fa-solid fa-magnifying-glass"></i></span>
+            <input type="text" name="q" value="{{ query }}" class="form-control border-0 shadow-none ps-1" placeholder="Search by destination, state, keyword..." aria-label="Search destinations">
+          </div>
+          <button type="submit" class="btn btn-primary-tms px-4 flex-shrink-0">
+            Search
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Filter & Results Section -->
+<section class="py-5">
+  <div class="container">
+    <!-- Category Filter Bar -->
+    <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3 mb-4 pb-3 border-bottom">
+      <div>
+        <span class="text-muted small d-block mb-1 text-uppercase fw-bold tracking-wider">Filter by Theme</span>
+        <div class="filter-pills-wrapper">
+          <a href="{% url 'destination_list' %}{% if query %}?q={{ query }}{% endif %}" class="filter-pill {% if not selected_category %}active{% endif %}">
+            <i class="fa-solid fa-border-all"></i> All Categories
+          </a>
+          {% for cat in categories %}
+            <a href="{% url 'destination_list' %}?category={{ cat.slug }}{% if query %}&q={{ query }}{% endif %}" 
+               class="filter-pill {% if selected_category and selected_category.id == cat.id %}active{% endif %}">
+              <i class="fa-solid {{ cat.icon }}"></i> {{ cat.name }}
+              <span class="badge-count">{{ cat.active_destinations_count }}</span>
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="text-md-end text-muted small flex-shrink-0">
+        Showing <strong class="text-dark">{{ total_count }}</strong> destination{{ total_count|pluralize }}
+        {% if query %}
+          for "<span class="text-primary fw-semibold">{{ query }}</span>"
+          <a href="{% url 'destination_list' %}{% if selected_category %}?category={{ selected_category.slug }}{% endif %}" class="text-danger ms-1 text-decoration-none"><i class="fa-solid fa-circle-xmark"></i> Clear search</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Destinations Grid -->
+    {% if destinations %}
+      <div class="row g-4">
+        {% for dest in destinations %}
+          <div class="col-md-6 col-lg-4">
+            <div class="destination-card">
+              <div class="destination-img-box">
+                {% if dest.image %}
+                  <img src="{{ dest.image.url }}" alt="{{ dest.name }}">
+                {% else %}
+                  <div class="destination-img-placeholder">
+                    <i class="fa-solid {{ dest.category.icon }} fs-1 mb-2"></i>
+                    <span class="fw-semibold small">{{ dest.category.name }}</span>
+                  </div>
+                {% endif %}
+
+                <!-- Category Badge -->
+                <div class="destination-category-badge">
+                  <i class="fa-solid {{ dest.category.icon }}"></i> {{ dest.category.name }}
+                </div>
+
+                <!-- Package Count Badge -->
+                <div class="destination-package-pill">
+                  <i class="fa-solid fa-suitcase-rolling text-primary me-1"></i> {{ dest.package_count }} Package{{ dest.package_count|pluralize }}
+                </div>
+              </div>
+
+              <div class="destination-card-body">
+                <div class="d-flex align-items-center gap-1 text-primary small fw-semibold mb-1">
+                  <i class="fa-solid fa-location-dot"></i> {{ dest.location }}
+                </div>
+                <h4 class="fw-bold mb-2">
+                  <a href="{% url 'destination_detail' dest.id %}" class="text-dark text-decoration-none">
+                    {{ dest.name }}
+                  </a>
+                </h4>
+                <p class="text-muted small mb-3 flex-grow-1">
+                  {{ dest.description|truncatewords:22 }}
+                </p>
+
+                <!-- Highlights Preview -->
+                {% with highlights=dest.get_highlights_list %}
+                  {% if highlights %}
+                    <div class="mb-3">
+                      {% for h in highlights|slice:":3" %}
+                        <span class="highlight-tag"><i class="fa-solid fa-check text-success me-1"></i>{{ h }}</span>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                {% endwith %}
+
+                <div class="d-flex align-items-center justify-content-between pt-3 border-top mt-auto">
+                  <div>
+                    {% if dest.starting_price %}
+                      <span class="price-sub">Starting from</span>
+                      <span class="fw-bold text-primary fs-5">&#8377; {{ dest.starting_price|floatformat:0 }}</span>
+                    {% else %}
+                      <span class="badge bg-secondary-subtle text-secondary">Seasonal</span>
+                    {% endif %}
+                  </div>
+                  <div class="d-flex gap-2">
+                    <a href="{% url 'destination_detail' dest.id %}" class="btn btn-outline-tms btn-sm">
+                      Details
+                    </a>
+                    <a href="{% url 'package_list' %}?destination={{ dest.id }}" class="btn btn-primary-tms btn-sm">
+                      Packages
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <!-- Empty State -->
+      <div class="card border-0 shadow-sm p-5 text-center my-4 bg-white rounded-4">
+        <div class="p-3 bg-light rounded-circle d-inline-block mx-auto mb-3 text-muted" style="width: 70px; height: 70px; display: flex; align-items: center; justify-content: center;">
+          <i class="fa-solid fa-map-location-dot fs-2 text-primary"></i>
+        </div>
+        <h4 class="fw-bold text-dark mb-2">No Destinations Found</h4>
+        <p class="text-muted max-w-md mx-auto mb-4">
+          We couldn't find any destinations matching your current search or category filter. Try clearing the filter or searching for another location.
+        </p>
+        <div>
+          <a href="{% url 'destination_list' %}" class="btn btn-primary-tms px-4">
+            <i class="fa-solid fa-arrows-rotate me-1"></i> View All Destinations
+          </a>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

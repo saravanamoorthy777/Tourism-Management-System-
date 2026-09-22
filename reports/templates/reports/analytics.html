@@ -1,0 +1,228 @@
+{% extends 'reports/base_admin.html' %}
+
+{% block title %}Reports & Analytics{% endblock %}
+
+{% block extra_head %}
+<style>
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+        #printableArea, #printableArea * {
+            visibility: visible;
+        }
+        #printableArea {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+        }
+        .no-print {
+            display: none !important;
+        }
+        .card {
+            border: 1px solid #ddd !important;
+            box-shadow: none !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
+    <h1 class="h2">Reports & Analytics</h1>
+    <div class="btn-toolbar mb-2 mb-md-0 no-print">
+        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.print()">
+            <i class="fas fa-print me-1"></i> Print / Export PDF
+        </button>
+    </div>
+</div>
+
+<div id="printableArea">
+    <div class="row mb-4">
+        <!-- Booking Summary -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-pie me-2 text-primary"></i>Booking Summary</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless mb-0">
+                        <tbody>
+                            <tr>
+                                <td><strong>Total Bookings</strong></td>
+                                <td class="text-end">{{ booking_summary.total }}</td>
+                            </tr>
+                            <tr class="text-success">
+                                <td>Confirmed</td>
+                                <td class="text-end">{{ booking_summary.confirmed }}</td>
+                            </tr>
+                            <tr class="text-warning">
+                                <td>Pending</td>
+                                <td class="text-end">{{ booking_summary.pending }}</td>
+                            </tr>
+                            <tr class="text-primary">
+                                <td>Completed</td>
+                                <td class="text-end">{{ booking_summary.completed }}</td>
+                            </tr>
+                            <tr class="text-danger">
+                                <td>Cancelled</td>
+                                <td class="text-end">{{ booking_summary.cancelled }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Revenue Summary -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-coins me-2 text-warning"></i>Revenue Summary</h5>
+                </div>
+                <div class="card-body d-flex flex-column justify-content-center align-items-center text-center">
+                    <h6 class="text-muted mb-3">Total Valid Revenue (Confirmed & Completed)</h6>
+                    <h1 class="display-4 text-success">₹{{ revenue_summary.total|default:"0.00"|floatformat:2 }}</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <!-- Popular Packages -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-box me-2 text-info"></i>Popular Packages</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Package Name</th>
+                                    <th class="text-center">Bookings</th>
+                                    <th class="text-end">Revenue</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pkg in popular_packages %}
+                                <tr>
+                                    <td>{{ pkg.name }}</td>
+                                    <td class="text-center"><span class="badge bg-secondary">{{ pkg.booking_count }}</span></td>
+                                    <td class="text-end">₹{{ pkg.revenue|default:"0.00"|floatformat:2 }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="3" class="text-center text-muted py-3">No data available</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Popular Destinations -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-map-marked-alt me-2 text-danger"></i>Popular Destinations</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Destination</th>
+                                    <th class="text-center">Bookings</th>
+                                    <th class="text-end">Revenue</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dest in popular_destinations %}
+                                <tr>
+                                    <td>{{ dest.name }}</td>
+                                    <td class="text-center"><span class="badge bg-secondary">{{ dest.booking_count }}</span></td>
+                                    <td class="text-end">₹{{ dest.revenue|default:"0.00"|floatformat:2 }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="3" class="text-center text-muted py-3">No data available</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Hotel Usage -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-hotel me-2 text-primary"></i>Hotel Usage</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Hotel Name</th>
+                                    <th>Destination</th>
+                                    <th class="text-center">Times Booked</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for hotel in hotel_usage %}
+                                <tr>
+                                    <td>{{ hotel.name }}</td>
+                                    <td>{{ hotel.destination.name }}</td>
+                                    <td class="text-center"><span class="badge bg-secondary">{{ hotel.usage_count }}</span></td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="3" class="text-center text-muted py-3">No data available</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vehicle Usage -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="fas fa-car me-2 text-success"></i>Vehicle Usage</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Vehicle Name</th>
+                                    <th>Type</th>
+                                    <th class="text-center">Times Booked</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for vehicle in vehicle_usage %}
+                                <tr>
+                                    <td>{{ vehicle.name }}</td>
+                                    <td>{{ vehicle.get_vehicle_type_display }}</td>
+                                    <td class="text-center"><span class="badge bg-secondary">{{ vehicle.usage_count }}</span></td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="3" class="text-center text-muted py-3">No data available</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

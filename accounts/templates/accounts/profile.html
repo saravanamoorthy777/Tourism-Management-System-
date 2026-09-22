@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Profile | Tourism Management System{% endblock %}
+
+{% block content %}
+<div class="container py-4 my-2">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <!-- Breadcrumb / Header -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1">
+              <li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none">Dashboard</a></li>
+              <li class="breadcrumb-item active" aria-current="page">My Profile</li>
+            </ol>
+          </nav>
+          <h2 class="fw-bold mb-0">Customer Profile Settings</h2>
+        </div>
+        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary rounded-3">
+          <i class="fa-solid fa-arrow-left me-1"></i> Back to Dashboard
+        </a>
+      </div>
+
+      <div class="card shadow-sm border-0 rounded-4 p-4 p-md-5 bg-white">
+        <form method="post" action="{% url 'profile' %}" enctype="multipart/form-data" novalidate>
+          {% csrf_token %}
+
+          <!-- Profile Photo Section -->
+          <div class="d-flex flex-column flex-sm-row align-items-center gap-4 pb-4 mb-4 border-bottom">
+            <div>
+              {% if profile.profile_image %}
+                <img src="{{ profile.profile_image.url }}" alt="{{ user.username }}" class="rounded-circle border border-3 border-primary shadow-sm" style="width: 90px; height: 90px; object-fit: cover;">
+              {% else %}
+                <div class="rounded-circle bg-light text-primary border border-2 d-flex align-items-center justify-content-center shadow-sm" style="width: 90px; height: 90px; font-size: 2.5rem;">
+                  <i class="fa-solid fa-user"></i>
+                </div>
+              {% endif %}
+            </div>
+            <div class="flex-grow-1 text-center text-sm-start">
+              <h5 class="fw-bold mb-1">{{ profile.full_name }}</h5>
+              <p class="text-muted small mb-2"><i class="fa-solid fa-at text-primary"></i> {{ user.username }} &bull; Customer Account</p>
+              <div class="col-md-8 col-lg-6">
+                <label for="profile_image_input" class="form-label small fw-semibold text-secondary">Change Profile Photo</label>
+                {{ profile_form.profile_image }}
+                {% if profile_form.profile_image.errors %}
+                  <div class="text-danger small mt-1">{{ profile_form.profile_image.errors.0 }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 1: Account Information -->
+          <div class="mb-4">
+            <h5 class="fw-bold text-primary mb-3">
+              <i class="fa-regular fa-id-badge me-2"></i> Account Details
+            </h5>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="profile_first_name" class="form-label small fw-semibold text-secondary">First Name <span class="text-danger">*</span></label>
+                {{ user_form.first_name }}
+                {% if user_form.first_name.errors %}
+                  <div class="text-danger small mt-1">{{ user_form.first_name.errors.0 }}</div>
+                {% endif %}
+              </div>
+
+              <div class="col-md-6">
+                <label for="profile_last_name" class="form-label small fw-semibold text-secondary">Last Name <span class="text-danger">*</span></label>
+                {{ user_form.last_name }}
+                {% if user_form.last_name.errors %}
+                  <div class="text-danger small mt-1">{{ user_form.last_name.errors.0 }}</div>
+                {% endif %}
+              </div>
+
+              <div class="col-md-6">
+                <label for="profile_email" class="form-label small fw-semibold text-secondary">Email Address <span class="text-danger">*</span></label>
+                {{ user_form.email }}
+                {% if user_form.email.errors %}
+                  <div class="text-danger small mt-1">{{ user_form.email.errors.0 }}</div>
+                {% endif %}
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold text-secondary">Username</label>
+                <input type="text" class="form-control bg-light" value="{{ user.username }}" readonly disabled>
+                <div class="text-muted small mt-1">Username is fixed and cannot be changed.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2: Contact & Address Information -->
+          <div class="mb-4 pt-3 border-top">
+            <h5 class="fw-bold text-primary mb-3">
+              <i class="fa-solid fa-location-dot me-2"></i> Contact & Address
+            </h5>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="profile_phone" class="form-label small fw-semibold text-secondary">Phone / Mobile Number</label>
+                {{ profile_form.phone_number }}
+                {% if profile_form.phone_number.errors %}
+                  <div class="text-danger small mt-1">{{ profile_form.phone_number.errors.0 }}</div>
+                {% endif %}
+              </div>
+
+              <div class="col-md-6">
+                <label for="profile_city" class="form-label small fw-semibold text-secondary">City</label>
+                {{ profile_form.city }}
+                {% if profile_form.city.errors %}
+                  <div class="text-danger small mt-1">{{ profile_form.city.errors.0 }}</div>
+                {% endif %}
+              </div>
+
+              <div class="col-md-6">
+                <label for="profile_state" class="form-label small fw-semibold text-secondary">State / Province</label>
+                {{ profile_form.state }}
+                {% if profile_form.state.errors %}
+                  <div class="text-danger small mt-1">{{ profile_form.state.errors.0 }}</div>
+                {% endif %}
+              </div>
+
+              <div class="col-md-6">
+                <label for="profile_pincode" class="form-label small fw-semibold text-secondary">Postal Code / PIN</label>
+                {{ profile_form.pincode }}
+                {% if profile_form.pincode.errors %}
+                  <div class="text-danger small mt-1">{{ profile_form.pincode.errors.0 }}</div>
+                {% endif %}
+              </div>
+
+              <div class="col-12">
+                <label for="profile_address" class="form-label small fw-semibold text-secondary">Street Address</label>
+                {{ profile_form.address }}
+                {% if profile_form.address.errors %}
+                  <div class="text-danger small mt-1">{{ profile_form.address.errors.0 }}</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary px-4 py-2">Cancel</a>
+            <button type="submit" class="btn btn-primary-tms px-4 py-2">
+              <i class="fa-solid fa-floppy-disk me-1"></i> Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

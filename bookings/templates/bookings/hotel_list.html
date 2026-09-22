@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Explore Hotels & Accommodations | Tourism Management System{% endblock %}
+
+{% block content %}
+<!-- Header Banner -->
+<section class="catalog-header-banner">
+  <div class="container position-relative">
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-white-50 text-decoration-none"><i class="fa-solid fa-house-chimney me-1"></i> Home</a></li>
+        <li class="breadcrumb-item active text-white" aria-current="page">Hotels</li>
+      </ol>
+    </nav>
+
+    <div class="row align-items-center gy-3">
+      <div class="col-lg-7">
+        <span class="badge bg-white-10 text-info fw-semibold px-3 py-1 rounded-pill mb-2 border border-white-20" style="background: rgba(255,255,255,0.15);">
+          <i class="fa-solid fa-hotel me-1"></i> Tiered Accommodations
+        </span>
+        <h1 class="text-white fw-bold mb-2">Partner Hotels & Stays</h1>
+        <p class="text-white-50 mb-0">
+          From comfortable Standard lodges to luxury 5-star Deluxe and Premium resorts. All rooms inspected and ready for dynamic itinerary booking.
+        </p>
+      </div>
+
+      <div class="col-lg-5">
+        <!-- Search Form -->
+        <form method="get" action="{% url 'hotel_list' %}" class="bg-white p-2 rounded-3 shadow-lg d-flex gap-2">
+          {% if selected_destination %}<input type="hidden" name="destination" value="{{ selected_destination.id }}">{% endif %}
+          {% if selected_tier %}<input type="hidden" name="tier" value="{{ selected_tier }}">{% endif %}
+          <div class="input-group border-0">
+            <span class="input-group-text bg-transparent border-0 text-muted ps-2"><i class="fa-solid fa-magnifying-glass"></i></span>
+            <input type="text" name="q" value="{{ query }}" class="form-control border-0 shadow-none ps-1" placeholder="Search hotels, locations, amenities..." aria-label="Search hotels">
+          </div>
+          <button type="submit" class="btn btn-primary-tms px-4 flex-shrink-0">
+            Search
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Filter & Results Section -->
+<section class="py-5">
+  <div class="container">
+    <!-- Filter Bar -->
+    <div class="card border-0 shadow-sm p-3 mb-4 rounded-4 bg-white">
+      <form method="get" action="{% url 'hotel_list' %}" id="hotelFilterForm" class="row g-3 align-items-center">
+        {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+
+        <!-- Destination Filter -->
+        <div class="col-md-5">
+          <label class="form-label small text-muted fw-bold mb-1"><i class="fa-solid fa-location-dot me-1 text-primary"></i> Destination</label>
+          <select name="destination" class="form-select border-1 rounded-3" onchange="document.getElementById('hotelFilterForm').submit();">
+            <option value="">All Destinations</option>
+            {% for dest in destinations %}
+              <option value="{{ dest.id }}" {% if selected_destination and selected_destination.id == dest.id %}selected{% endif %}>
+                {{ dest.name }} ({{ dest.location }})
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Tier Filter -->
+        <div class="col-md-5">
+          <label class="form-label small text-muted fw-bold mb-1"><i class="fa-solid fa-award me-1 text-warning"></i> Hotel Tier</label>
+          <select name="tier" class="form-select border-1 rounded-3" onchange="document.getElementById('hotelFilterForm').submit();">
+            <option value="">All Tiers (Standard, Deluxe, Premium)</option>
+            {% for tier_key, tier_name in tiers %}
+              <option value="{{ tier_key }}" {% if selected_tier == tier_key %}selected{% endif %}>
+                {{ tier_name }} Tier
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Reset Button -->
+        <div class="col-md-2 d-flex align-items-end">
+          {% if selected_destination or selected_tier or query %}
+            <a href="{% url 'hotel_list' %}" class="btn btn-outline-secondary w-100 rounded-3">
+              <i class="fa-solid fa-rotate-left me-1"></i> Reset
+            </a>
+          {% else %}
+            <button type="submit" class="btn btn-primary-tms w-100 rounded-3">
+              <i class="fa-solid fa-filter me-1"></i> Apply
+            </button>
+          {% endif %}
+        </div>
+      </form>
+    </div>
+
+    <!-- Results Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h4 class="fw-bold mb-0 text-dark">
+          Available Hotels
+          <span class="badge bg-primary-subtle text-primary fs-6 ms-2 rounded-pill">{{ total_count }}</span>
+        </h4>
+        <small class="text-muted">
+          {% if selected_destination %}In <strong>{{ selected_destination.name }}</strong> &bull; {% endif %}
+          {% if selected_tier %}Tier: <strong>{{ selected_tier|title }}</strong> &bull; {% endif %}
+          Showing active verified partner properties
+        </small>
+      </div>
+    </div>
+
+    <!-- Hotel Cards Grid -->
+    {% if hotels %}
+      <div class="row g-4">
+        {% for hotel in hotels %}
+          <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden destination-card">
+              <!-- Hotel Thumbnail/Badge -->
+              <div class="position-relative" style="height: 200px; background: linear-gradient(135deg, #1e293b, #334155);">
+                {% if hotel.image %}
+                  <img src="{{ hotel.image.url }}" alt="{{ hotel.name }}" class="w-100 h-100 object-fit-cover">
+                {% else %}
+                  <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center text-white-50">
+                    <i class="fa-solid fa-hotel fs-1 mb-2"></i>
+                    <span class="small">{{ hotel.name }}</span>
+                  </div>
+                {% endif %}
+
+                <!-- Tier Badge -->
+                <div class="position-absolute top-0 start-0 m-3">
+                  {% if hotel.tier == 'premium' %}
+                    <span class="badge bg-warning text-dark fw-bold px-3 py-2 shadow-sm rounded-pill">
+                      <i class="fa-solid fa-crown me-1"></i> Premium 5-Star
+                    </span>
+                  {% elif hotel.tier == 'deluxe' %}
+                    <span class="badge bg-primary text-white fw-bold px-3 py-2 shadow-sm rounded-pill">
+                      <i class="fa-solid fa-star me-1"></i> Deluxe 4-Star
+                    </span>
+                  {% else %}
+                    <span class="badge bg-secondary text-white fw-bold px-3 py-2 shadow-sm rounded-pill">
+                      <i class="fa-solid fa-shield me-1"></i> Standard
+                    </span>
+                  {% endif %}
+                </div>
+
+                <!-- Destination Pill -->
+                <div class="position-absolute bottom-0 start-0 m-3">
+                  <span class="badge bg-dark-subtle text-light fw-medium px-2 py-1 rounded-3" style="background: rgba(15, 23, 42, 0.75);">
+                    <i class="fa-solid fa-location-dot text-info me-1"></i> {{ hotel.destination.name }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Card Body -->
+              <div class="card-body p-4 d-flex flex-column">
+                <h5 class="fw-bold mb-1 text-dark">{{ hotel.name }}</h5>
+                <p class="text-muted small mb-2 text-truncate">
+                  <i class="fa-solid fa-map-pin me-1 text-danger"></i> {{ hotel.location|default:hotel.destination.location }}
+                </p>
+
+                <div class="mb-3">
+                  <span class="badge bg-light text-secondary border px-2 py-1 rounded-2 small">
+                    <i class="fa-solid fa-bed me-1 text-primary"></i> {{ hotel.room_type }}
+                  </span>
+                </div>
+
+                <p class="text-muted small mb-4 flex-grow-1" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                  {{ hotel.description }}
+                </p>
+
+                <!-- Pricing and Availability Box -->
+                <div class="pt-3 border-top mt-auto d-flex justify-content-between align-items-center">
+                  <div>
+                    <span class="text-muted small d-block">Price / Night</span>
+                    <span class="fw-bold fs-5 text-primary">&#8377; {{ hotel.price_per_night|floatformat:0 }}</span>
+                  </div>
+                  <div class="text-end">
+                    {% if hotel.available_rooms > 5 %}
+                      <span class="badge bg-success-subtle text-success fw-semibold px-2 py-1 rounded-pill small">
+                        <i class="fa-solid fa-circle-check me-1"></i> {{ hotel.available_rooms }} Rooms Available
+                      </span>
+                    {% elif hotel.available_rooms > 0 %}
+                      <span class="badge bg-warning-subtle text-warning fw-semibold px-2 py-1 rounded-pill small">
+                        <i class="fa-solid fa-clock me-1"></i> Only {{ hotel.available_rooms }} Left!
+                      </span>
+                    {% else %}
+                      <span class="badge bg-danger-subtle text-danger fw-semibold px-2 py-1 rounded-pill small">
+                        <i class="fa-solid fa-ban me-1"></i> Sold Out
+                      </span>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="mt-3">
+                  <a href="{% url 'hotel_detail' hotel.id %}" class="btn btn-outline-tms w-100 rounded-3">
+                    View Hotel Details <i class="fa-solid fa-arrow-right ms-1"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="card border-0 shadow-sm p-5 text-center rounded-4 bg-white">
+        <div class="mb-3 text-muted">
+          <i class="fa-solid fa-hotel fs-1"></i>
+        </div>
+        <h4 class="fw-bold text-dark">No Hotels Found</h4>
+        <p class="text-muted mb-4">We couldn't find any partner hotels matching your current filter criteria.</p>
+        <div>
+          <a href="{% url 'hotel_list' %}" class="btn btn-primary-tms px-4 rounded-3">
+            <i class="fa-solid fa-rotate-left me-1"></i> Clear Filters
+          </a>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

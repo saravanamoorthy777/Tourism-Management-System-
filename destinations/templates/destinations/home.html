@@ -1,0 +1,374 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Explore The World | Tourism Management System{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-wrapper">
+  <div class="container position-relative">
+    <div class="row align-items-center gy-4">
+      <div class="col-lg-7">
+        <div class="hero-badge">
+          <i class="fa-solid fa-graduation-cap text-warning"></i> Diploma CSE Capstone Project &bull; Phase 4 Active
+        </div>
+        <h1 class="hero-title">
+          Smart Travel Planning, <br>
+          <span class="text-info">Transparent Costing.</span>
+        </h1>
+        <p class="hero-subtitle">
+          Experience seamless tour discovery, custom itinerary selection with vehicle and hotel tiers, automatic price calculations, and instant digital booking vouchers.
+        </p>
+
+        <!-- Search Bar -->
+        <div class="card p-2 bg-white rounded-3 shadow-lg border-0 mt-4 max-w-lg">
+          <form class="row g-2 align-items-center" method="get" action="{% url 'destination_list' %}">
+            <div class="col-md-5">
+              <div class="input-group">
+                <span class="input-group-text bg-transparent border-0 text-muted"><i class="fa-solid fa-location-dot"></i></span>
+                <input type="text" name="q" class="form-control border-0 shadow-none" placeholder="Where to?" aria-label="Destination keyword">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <span class="input-group-text bg-transparent border-0 text-muted"><i class="fa-solid fa-layer-group"></i></span>
+                <select name="category" class="form-select border-0 shadow-none text-muted">
+                  <option value="" selected>All Themes</option>
+                  {% for cat in categories %}
+                    <option value="{{ cat.slug }}">{{ cat.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <button class="btn btn-primary-tms w-100 py-2" type="submit">
+                <i class="fa-solid fa-magnifying-glass me-1"></i> Search
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div class="d-flex align-items-center gap-4 mt-4 text-white-50 small">
+          <div><i class="fa-solid fa-check-circle text-success me-1"></i> Transparent Pricing</div>
+          <div><i class="fa-solid fa-check-circle text-success me-1"></i> Instant Day-wise Schedules</div>
+          <div><i class="fa-solid fa-check-circle text-success me-1"></i> Multi-tier Packages</div>
+        </div>
+      </div>
+
+      <div class="col-lg-5">
+        <div class="card border-0 bg-white shadow-lg p-4 rounded-4 position-relative">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <span class="badge bg-primary-subtle text-primary fw-bold px-3 py-2 rounded-pill">Architecture Showcase</span>
+            <span class="badge bg-success-subtle text-success fw-bold px-3 py-2 rounded-pill"><i class="fa-solid fa-circle-check me-1"></i> Phase 4 Pricing Engine Live</span>
+          </div>
+          <h4 class="fw-bold mb-2">Cost Engine Preview</h4>
+          <p class="text-muted small mb-3">Multi-tiered dynamic calculation model as per project specification:</p>
+          
+          <div class="bg-light p-3 rounded-3 mb-3 border">
+            <div class="d-flex justify-content-between small text-muted mb-1">
+              <span>Base Package (2 Persons)</span>
+              <span class="fw-bold text-dark">&#8377; 15,000</span>
+            </div>
+            <div class="d-flex justify-content-between small text-muted mb-1">
+              <span>Hotel Tier Surcharge (Deluxe 4-Star)</span>
+              <span class="fw-bold text-dark">&#8377; 4,500</span>
+            </div>
+            <div class="d-flex justify-content-between small text-muted mb-1">
+              <span>Dedicated Vehicle (SUV)</span>
+              <span class="fw-bold text-dark">&#8377; 6,000</span>
+            </div>
+            <div class="d-flex justify-content-between small text-muted mb-1">
+              <span>Estimated Tax (GST 5%)</span>
+              <span class="fw-bold text-dark">&#8377; 1,275</span>
+            </div>
+            <hr class="my-2">
+            <div class="d-flex justify-content-between fw-bold text-primary">
+              <span>Total Estimated Cost</span>
+              <span class="fs-5">&#8377; 26,775</span>
+            </div>
+          </div>
+
+          <div class="d-flex gap-2">
+            <a href="{% url 'package_list' %}" class="btn btn-primary-tms flex-grow-1">
+              <i class="fa-solid fa-suitcase-rolling me-1"></i> View Packages
+            </a>
+            <a href="{% url 'destination_list' %}" class="btn btn-outline-tms">
+              Destinations
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Destination Categories Showcase -->
+<section class="py-5" id="destinations">
+  <div class="container py-4">
+    <div class="text-center max-w-md mx-auto mb-5">
+      <span class="section-tagline">Curated Themes</span>
+      <h2 class="section-heading">Explore By Category</h2>
+      <p class="text-muted">Browse tour packages categorized by your travel preference and adventure profile.</p>
+    </div>
+
+    <div class="row g-4">
+      {% for cat in categories %}
+        <div class="col-md-6 col-lg-3">
+          <a href="{% url 'destination_list' %}?category={{ cat.slug }}" class="text-decoration-none">
+            <div class="feature-card text-center">
+              <div class="feature-icon-wrapper {% if cat.slug == 'adventure' %}bg-adventure{% elif cat.slug == 'heritage' %}bg-heritage{% elif cat.slug == 'beach' %}bg-beach{% elif cat.slug == 'wildlife' %}bg-wildlife{% else %}bg-primary-subtle text-primary{% endif %} mx-auto">
+                <i class="fa-solid {{ cat.icon }}"></i>
+              </div>
+              <h4 class="fw-bold mb-2 text-dark">{{ cat.name }}</h4>
+              <p class="text-muted small mb-3">{{ cat.description|truncatewords:14 }}</p>
+              <span class="badge bg-light text-secondary border px-3 py-1 rounded-pill">
+                {{ cat.active_destinations_count }} Destination{{ cat.active_destinations_count|pluralize }} &bull; Explore &rarr;
+              </span>
+            </div>
+          </a>
+        </div>
+      {% empty %}
+        <div class="col-12 text-center text-muted">
+          <p>No active destination categories available.</p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Featured Destinations Showcase -->
+{% if featured_destinations %}
+<section class="py-5 bg-white border-top border-bottom">
+  <div class="container py-2">
+    <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between mb-4 gap-2">
+      <div>
+        <span class="section-tagline">Top Rated Spots</span>
+        <h2 class="section-heading mb-0">Featured Destinations</h2>
+      </div>
+      <a href="{% url 'destination_list' %}" class="btn btn-outline-tms">
+        View All Destinations <i class="fa-solid fa-arrow-right ms-1"></i>
+      </a>
+    </div>
+
+    <div class="row g-4">
+      {% for dest in featured_destinations %}
+        <div class="col-md-6 col-lg-4">
+          <div class="destination-card">
+            <div class="destination-img-box">
+              {% if dest.image %}
+                <img src="{{ dest.image.url }}" alt="{{ dest.name }}">
+              {% else %}
+                <div class="destination-img-placeholder">
+                  <i class="fa-solid {{ dest.category.icon }} fs-1 mb-2"></i>
+                  <span class="fw-semibold small">{{ dest.category.name }}</span>
+                </div>
+              {% endif %}
+
+              <div class="destination-category-badge">
+                <i class="fa-solid {{ dest.category.icon }}"></i> {{ dest.category.name }}
+              </div>
+
+              <div class="destination-package-pill">
+                <i class="fa-solid fa-ticket text-primary me-1"></i> {{ dest.package_count }} Package{{ dest.package_count|pluralize }}
+              </div>
+            </div>
+
+            <div class="destination-card-body">
+              <div class="d-flex align-items-center gap-1 text-primary small fw-semibold mb-1">
+                <i class="fa-solid fa-location-dot"></i> {{ dest.location }}
+              </div>
+              <h5 class="fw-bold mb-2">
+                <a href="{% url 'destination_detail' dest.id %}" class="text-dark text-decoration-none">
+                  {{ dest.name }}
+                </a>
+              </h5>
+              <p class="text-muted small mb-3 flex-grow-1">
+                {{ dest.description|truncatewords:16 }}
+              </p>
+
+              <div class="d-flex align-items-center justify-content-between pt-3 border-top mt-auto">
+                <div>
+                  {% if dest.starting_price %}
+                    <span class="price-sub">Starting from</span>
+                    <span class="fw-bold text-primary fs-5">&#8377; {{ dest.starting_price|floatformat:0 }}</span>
+                  {% else %}
+                    <span class="badge bg-light text-muted border">Packages Available</span>
+                  {% endif %}
+                </div>
+                <a href="{% url 'destination_detail' dest.id %}" class="btn btn-outline-tms btn-sm">
+                  Explore Details
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- Popular Tour Packages Showcase -->
+{% if popular_packages %}
+<section class="py-5 bg-light" id="packages">
+  <div class="container py-2">
+    <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between mb-4 gap-2">
+      <div>
+        <span class="section-tagline">Trending Itineraries</span>
+        <h2 class="section-heading mb-0">Popular Tour Packages</h2>
+      </div>
+      <a href="{% url 'package_list' %}" class="btn btn-outline-tms">
+        View All Packages <i class="fa-solid fa-arrow-right ms-1"></i>
+      </a>
+    </div>
+
+    <div class="row g-4">
+      {% for pkg in popular_packages %}
+        <div class="col-md-6 col-lg-3">
+          <div class="package-card">
+            <div class="package-img-box" style="height: 180px;">
+              {% if pkg.image %}
+                <img src="{{ pkg.image.url }}" alt="{{ pkg.name }}">
+              {% else %}
+                <div class="destination-img-placeholder">
+                  <i class="fa-solid fa-suitcase-rolling fs-2 mb-1"></i>
+                  <span class="small">{{ pkg.destination.name }}</span>
+                </div>
+              {% endif %}
+
+              <div class="package-duration-badge">
+                <i class="fa-solid fa-clock me-1"></i> {{ pkg.duration }}
+              </div>
+            </div>
+
+            <div class="package-card-body p-3">
+              <div class="small text-muted mb-1 text-truncate">
+                <i class="fa-solid fa-location-dot text-primary me-1"></i> {{ pkg.destination.name }}
+              </div>
+              <h6 class="fw-bold mb-2">
+                <a href="{% url 'package_detail' pkg.id %}" class="text-dark text-decoration-none">
+                  {{ pkg.name }}
+                </a>
+              </h6>
+              <p class="text-muted small mb-2 flex-grow-1">
+                {{ pkg.description|truncatewords:12 }}
+              </p>
+            </div>
+
+            <div class="package-price-box p-3">
+              <div>
+                <span class="price-sub">Base Price</span>
+                <span class="fw-bold text-primary fs-5">&#8377; {{ pkg.base_price|floatformat:0 }}</span>
+              </div>
+              <a href="{% url 'package_detail' pkg.id %}" class="btn btn-primary-tms btn-sm">
+                Details
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- System Features & Academic Highlights -->
+<section class="py-5 bg-white border-top border-bottom" id="features">
+  <div class="container py-4">
+    <div class="row align-items-center gy-4">
+      <div class="col-lg-6">
+        <span class="section-tagline">Academic & Functional Scope</span>
+        <h2 class="section-heading">Built to Professional Industry Standards</h2>
+        <p class="text-muted mb-4">
+          Engineered using Django's Model-View-Template pattern to replace legacy PHP architectures with clean Pythonic OOP, strict relational database integrity in MySQL, and an automated costing engine.
+        </p>
+
+        <div class="d-flex align-items-start gap-3 mb-3">
+          <div class="p-2 rounded-3 bg-primary-subtle text-primary mt-1">
+            <i class="fa-solid fa-layer-group fs-5"></i>
+          </div>
+          <div>
+            <h5 class="fw-bold mb-1">Destination & Tour Package Catalog</h5>
+            <p class="text-muted small mb-0">Normalized relational models linking categories, destinations, tour packages, and day-by-day itineraries with full admin control.</p>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-start gap-3 mb-3">
+          <div class="p-2 rounded-3 bg-success-subtle text-success mt-1">
+            <i class="fa-solid fa-calculator fs-5"></i>
+          </div>
+          <div>
+            <h5 class="fw-bold mb-1">Dynamic Cost Calculation Engine</h5>
+            <p class="text-muted small mb-0">Computes base costs, hotel tier surcharges, vehicle daily rates, and seasonal multipliers automatically.</p>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-start gap-3">
+          <div class="p-2 rounded-3 bg-info-subtle text-info mt-1">
+            <i class="fa-solid fa-shield-halved fs-5"></i>
+          </div>
+          <div>
+            <h5 class="fw-bold mb-1">Secure Role-Based Administration</h5>
+            <p class="text-muted small mb-0">Dedicated portal for package management, booking verification, customer inquiries, and revenue trends.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="card border-0 shadow-sm p-4 rounded-4 bg-light">
+          <div class="d-flex align-items-center justify-content-between border-bottom pb-3 mb-3">
+            <h5 class="fw-bold mb-0"><i class="fa-solid fa-server text-primary me-2"></i> Phase 4 System Status</h5>
+            <span class="badge bg-success"><i class="fa-solid fa-circle-dot me-1"></i> Active</span>
+          </div>
+
+          <ul class="list-group list-group-flush bg-transparent">
+            <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center py-2 px-0">
+              <span class="text-muted"><i class="fa-solid fa-calculator text-primary me-2"></i> Dynamic Pricing Engine</span>
+              <span class="badge bg-success-subtle text-success">Active & Real-Time (GST 5% + Seasonal Factors)</span>
+            </li>
+            <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center py-2 px-0">
+              <span class="text-muted"><i class="fa-solid fa-hotel text-warning me-2"></i> Accommodations & Fleet</span>
+              <span class="badge bg-primary-subtle text-primary">Hotel Tiers (Standard, Deluxe, Premium) & Vehicles</span>
+            </li>
+            <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center py-2 px-0">
+              <span class="text-muted"><i class="fa-solid fa-layer-group text-info me-2"></i> Catalog Models</span>
+              <span class="badge bg-dark-subtle text-dark">DestinationCategory, Destination, TourPackage, Itinerary</span>
+            </li>
+            <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center py-2 px-0">
+              <span class="text-muted"><i class="fa-solid fa-database text-success me-2"></i> Database Engine</span>
+              <span class="badge bg-dark-subtle text-dark">MySQL Server 5.5.20 + PyMySQL Shim</span>
+            </li>
+            <li class="list-group-item bg-transparent d-flex justify-content-between align-items-center py-2 px-0">
+              <span class="text-muted"><i class="fa-solid fa-code text-secondary me-2"></i> Responsive UI</span>
+              <span class="badge bg-dark-subtle text-dark">Bootstrap 5.3 + Live Calculator</span>
+            </li>
+          </ul>
+
+          <div class="mt-4 p-3 bg-white rounded-3 border">
+            <p class="small text-muted mb-0">
+              <i class="fa-solid fa-lightbulb text-warning me-1"></i> <strong>Next Phase:</strong> Phase 5 will introduce Customer Booking Workflow, Booking Management, and Confirmations.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Call to Action Banner -->
+<section class="py-5 bg-primary text-white text-center">
+  <div class="container py-2">
+    <h2 class="text-white fw-bold mb-3">Ready to plan your next journey?</h2>
+    <p class="text-white-50 max-w-md mx-auto mb-4">
+      Join thousands of travelers exploring India and beyond with our comprehensive travel portal.
+    </p>
+    <div class="d-flex justify-content-center gap-3">
+      {% if not user.is_authenticated %}
+        <a href="{% url 'register' %}" class="btn btn-light px-4 py-2 fw-semibold text-primary rounded-3">Get Started</a>
+      {% endif %}
+      <a href="{% url 'destination_list' %}" class="btn btn-outline-light px-4 py-2 fw-semibold rounded-3">Browse Destinations</a>
+      <a href="{% url 'package_list' %}" class="btn btn-light px-4 py-2 fw-semibold text-primary rounded-3">Explore Tour Packages</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

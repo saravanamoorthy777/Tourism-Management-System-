@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Booking Confirmed | Tourism Management System{% endblock %}
+
+{% block content %}
+<div class="container py-5 my-2">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 text-center">
+      
+      <!-- Progress Bar -->
+      <div class="mb-4">
+        <h2 class="fw-bold mb-3">Booking Status</h2>
+        <div class="d-flex justify-content-center align-items-center mb-2">
+          <span class="badge bg-success rounded-pill px-3 py-2">1. Select Package</span>
+          <div class="bg-success mx-2" style="height: 2px; width: 40px;"></div>
+          <span class="badge bg-success rounded-pill px-3 py-2">2. Review Details</span>
+          <div class="bg-success mx-2" style="height: 2px; width: 40px;"></div>
+          <span class="badge bg-primary rounded-pill px-3 py-2">3. Confirmation</span>
+        </div>
+      </div>
+
+      <!-- Success Icon -->
+      <div class="mb-4">
+        <div class="d-inline-flex align-items-center justify-content-center bg-success-subtle text-success rounded-circle" style="width: 100px; height: 100px; font-size: 3rem;">
+          <i class="fa-solid fa-check"></i>
+        </div>
+      </div>
+
+      <h1 class="fw-bold text-dark mb-2">Booking Confirmed!</h1>
+      <p class="text-muted fs-5 mb-4">Your trip to {{ booking.package.destination.name }} has been successfully booked.</p>
+
+      <div class="card border-0 shadow-sm rounded-4 mb-4 text-start overflow-hidden">
+        <div class="bg-light p-3 border-bottom d-flex justify-content-between align-items-center">
+          <span class="text-muted fw-semibold small text-uppercase tracking-wider">Booking Reference</span>
+          <span class="badge bg-success px-3 py-1">{{ booking.get_status_display }}</span>
+        </div>
+        <div class="card-body p-4">
+          <div class="text-center mb-4">
+            <h3 class="display-6 fw-bold text-primary font-monospace mb-0">{{ booking.booking_reference }}</h3>
+            <p class="text-muted small mt-2">Please save this reference number for your records.</p>
+          </div>
+          
+          <div class="row g-3 bg-light rounded-3 p-3 border">
+            <div class="col-sm-6">
+              <span class="text-muted small d-block">Tour Package</span>
+              <span class="fw-semibold">{{ booking.package.name }}</span>
+            </div>
+            <div class="col-sm-6">
+              <span class="text-muted small d-block">Travel Dates</span>
+              <span class="fw-semibold">{{ booking.start_date|date:"M d, Y" }} &mdash; {{ booking.end_date|date:"M d, Y" }}</span>
+            </div>
+            <div class="col-sm-6">
+              <span class="text-muted small d-block">Travelers</span>
+              <span class="fw-semibold">{{ booking.persons }} Person{{ booking.persons|pluralize }}</span>
+            </div>
+            <div class="col-sm-6">
+              <span class="text-muted small d-block">Amount Paid / Due</span>
+              <span class="fw-bold text-primary">&#8377;{{ booking.grand_total|floatformat:0 }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex flex-column flex-md-row gap-3 justify-content-center">
+        <a href="{% url 'booking_detail' booking.booking_reference %}" class="btn btn-outline-primary py-3 px-4 rounded-3 fw-semibold">
+          <i class="fa-solid fa-file-invoice me-1"></i> View Full Receipt
+        </a>
+        <a href="{% url 'my_bookings' %}" class="btn btn-primary-tms py-3 px-4 rounded-3 fw-bold">
+          <i class="fa-solid fa-suitcase-rolling me-1"></i> Go to My Bookings
+        </a>
+      </div>
+      
+    </div>
+  </div>
+</div>
+{% endblock %}

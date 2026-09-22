@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ destination.name }} | Tourism Management System{% endblock %}
+
+{% block content %}
+<!-- Destination Header Banner -->
+<section class="catalog-header-banner">
+  <div class="container position-relative">
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-white-50 text-decoration-none"><i class="fa-solid fa-house-chimney me-1"></i> Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'destination_list' %}" class="text-white-50 text-decoration-none">Destinations</a></li>
+        <li class="breadcrumb-item active text-white" aria-current="page">{{ destination.name }}</li>
+      </ol>
+    </nav>
+
+    <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+      <span class="badge bg-primary text-white fw-semibold px-3 py-1 rounded-pill">
+        <i class="fa-solid {{ destination.category.icon }} me-1"></i> {{ destination.category.name }}
+      </span>
+      <span class="badge bg-white-10 text-white-50 px-3 py-1 rounded-pill" style="background: rgba(255,255,255,0.15);">
+        <i class="fa-solid fa-calendar-check me-1"></i> Updated {{ destination.updated_at|date:"M Y" }}
+      </span>
+    </div>
+
+    <h1 class="text-white fw-bold display-5 mb-2">{{ destination.name }}</h1>
+    <p class="text-white-50 fs-5 mb-0">
+      <i class="fa-solid fa-location-dot text-info me-1"></i> {{ destination.location }}
+    </p>
+  </div>
+</section>
+
+<!-- Main Details & Packages Content -->
+<section class="py-5">
+  <div class="container">
+    <div class="row g-4">
+      <!-- Main Content Column -->
+      <div class="col-lg-8">
+        <!-- Destination Overview Card -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+          <h3 class="fw-bold mb-3 text-dark">About {{ destination.name }}</h3>
+          <p class="text-muted leading-relaxed mb-4" style="font-size: 1.05rem; white-space: pre-line;">
+            {{ destination.description }}
+          </p>
+
+          <!-- Highlights Section -->
+          {% with highlights=destination.get_highlights_list %}
+            {% if highlights %}
+              <div class="p-3 bg-light rounded-3 border">
+                <h5 class="fw-bold text-dark mb-3">
+                  <i class="fa-solid fa-star text-warning me-2"></i> Key Attractions & Highlights
+                </h5>
+                <div class="row g-2">
+                  {% for h in highlights %}
+                    <div class="col-md-6">
+                      <div class="d-flex align-items-center gap-2 text-secondary">
+                        <i class="fa-solid fa-circle-check text-success flex-shrink-0"></i>
+                        <span>{{ h }}</span>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+            {% endif %}
+          {% endwith %}
+        </div>
+
+        <!-- Available Packages for this Destination -->
+        <div class="mb-4">
+          <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+              <span class="section-tagline">Curated Itineraries</span>
+              <h3 class="fw-bold text-dark mb-0">Tour Packages in {{ destination.name }}</h3>
+            </div>
+            <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-semibold">
+              {{ packages.count }} Package{{ packages.count|pluralize }} Available
+            </span>
+          </div>
+
+          {% if packages %}
+            <div class="row g-4">
+              {% for pkg in packages %}
+                <div class="col-md-6">
+                  <div class="package-card">
+                    <div class="package-img-box">
+                      {% if pkg.image %}
+                        <img src="{{ pkg.image.url }}" alt="{{ pkg.name }}">
+                      {% else %}
+                        <div class="destination-img-placeholder">
+                          <i class="fa-solid fa-suitcase-rolling fs-1 mb-2"></i>
+                          <span class="fw-semibold small">{{ pkg.name }}</span>
+                        </div>
+                      {% endif %}
+                      <div class="package-duration-badge">
+                        <i class="fa-solid fa-clock me-1"></i> {{ pkg.duration }}
+                      </div>
+                    </div>
+
+                    <div class="package-card-body">
+                      <h5 class="fw-bold mb-2">
+                        <a href="{% url 'package_detail' pkg.id %}" class="text-dark text-decoration-none">
+                          {{ pkg.name }}
+                        </a>
+                      </h5>
+                      <p class="text-muted small mb-3 flex-grow-1">
+                        {{ pkg.description|truncatewords:16 }}
+                      </p>
+
+                      {% with incs=pkg.get_inclusions_list %}
+                        {% if incs %}
+                          <div class="mb-2">
+                            {% for inc in incs|slice:":2" %}
+                              <div class="small text-muted text-truncate mb-1">
+                                <i class="fa-solid fa-check text-success me-1"></i> {{ inc }}
+                              </div>
+                            {% endfor %}
+                          </div>
+                        {% endif %}
+                      {% endwith %}
+                    </div>
+
+                    <div class="package-price-box">
+                      <div>
+                        <span class="price-sub">Base Price (Per Person)</span>
+                        <div class="price-display text-primary">&#8377; {{ pkg.base_price|floatformat:0 }}</div>
+                      </div>
+                      <a href="{% url 'package_detail' pkg.id %}" class="btn btn-primary-tms btn-sm">
+                        View Itinerary <i class="fa-solid fa-arrow-right ms-1"></i>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="card border-0 shadow-sm p-4 text-center bg-white rounded-3">
+              <i class="fa-solid fa-calendar-xmark text-muted fs-2 mb-2"></i>
+              <h5 class="fw-bold text-dark">No Tour Packages Currently Listed</h5>
+              <p class="text-muted small mb-3">Our tour specialists are currently preparing new seasonal itineraries for this destination.</p>
+              <a href="{% url 'package_list' %}" class="btn btn-outline-tms btn-sm mx-auto">Explore All Packages</a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Sidebar Column -->
+      <div class="col-lg-4">
+        <!-- Quick Facts Card -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+          <h5 class="fw-bold mb-3 border-bottom pb-2">
+            <i class="fa-solid fa-circle-info text-primary me-2"></i> Destination Summary
+          </h5>
+
+          <ul class="list-unstyled mb-0">
+            <li class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted small"><i class="fa-solid fa-layer-group me-2"></i> Category</span>
+              <span class="fw-semibold text-dark small">{{ destination.category.name }}</span>
+            </li>
+            <li class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted small"><i class="fa-solid fa-map-pin me-2"></i> Region</span>
+              <span class="fw-semibold text-dark small">{{ destination.location }}</span>
+            </li>
+            <li class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted small"><i class="fa-solid fa-ticket me-2"></i> Packages</span>
+              <span class="badge bg-primary-subtle text-primary rounded-pill">{{ packages.count }} Active</span>
+            </li>
+            <li class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted small"><i class="fa-solid fa-shield-halved me-2"></i> Status</span>
+              <span class="badge bg-success-subtle text-success rounded-pill">Verified Tourist Hub</span>
+            </li>
+            <li class="d-flex justify-content-between py-2">
+              <span class="text-muted small"><i class="fa-solid fa-clock-rotate-left me-2"></i> Catalog ID</span>
+              <span class="text-muted small font-monospace">#DEST-{{ destination.id|stringformat:"04d" }}</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Related Destinations -->
+        {% if related_destinations %}
+          <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+            <h5 class="fw-bold mb-3 border-bottom pb-2">
+              <i class="fa-solid fa-compass text-primary me-2"></i> Similar {{ destination.category.name }} Spots
+            </h5>
+
+            <div class="d-flex flex-column gap-3">
+              {% for rel in related_destinations %}
+                <a href="{% url 'destination_detail' rel.id %}" class="text-decoration-none text-dark p-2 rounded-3 bg-light hover-bg d-flex align-items-center justify-content-between">
+                  <div>
+                    <div class="fw-bold small">{{ rel.name }}</div>
+                    <div class="text-muted small"><i class="fa-solid fa-location-dot me-1 text-primary"></i> {{ rel.location }}</div>
+                  </div>
+                  <i class="fa-solid fa-chevron-right text-muted small"></i>
+                </a>
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+
+        <!-- Navigation Shortcut -->
+        <div class="p-4 rounded-4 bg-primary text-white text-center shadow-sm">
+          <i class="fa-solid fa-suitcase-rolling fs-1 mb-2 text-info"></i>
+          <h5 class="fw-bold text-white mb-1">Browse All Tour Packages</h5>
+          <p class="text-white-50 small mb-3">Compare prices, hotel tiers and multi-day schedules across all destinations.</p>
+          <a href="{% url 'package_list' %}" class="btn btn-light fw-semibold text-primary w-100 btn-sm">
+            View Full Package Catalog
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

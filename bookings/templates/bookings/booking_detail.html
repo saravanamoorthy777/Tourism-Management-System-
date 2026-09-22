@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Booking Details | Tourism Management System{% endblock %}
+
+{% block content %}
+<div class="container py-5 my-2">
+  <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+    <div>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1">
+          <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-decoration-none">Home</a></li>
+          <li class="breadcrumb-item"><a href="{% url 'my_bookings' %}" class="text-decoration-none">My Bookings</a></li>
+          <li class="breadcrumb-item active" aria-current="page">{{ booking.booking_reference }}</li>
+        </ol>
+      </nav>
+      <h2 class="fw-bold mb-0">Booking Details</h2>
+    </div>
+    
+    <div>
+      {% if booking.status == 'confirmed' %}
+        <span class="badge bg-success px-4 py-2 fs-6 rounded-pill shadow-sm">Confirmed</span>
+      {% elif booking.status == 'pending' %}
+        <span class="badge bg-warning text-dark px-4 py-2 fs-6 rounded-pill shadow-sm">Pending</span>
+      {% elif booking.status == 'cancelled' %}
+        <span class="badge bg-danger px-4 py-2 fs-6 rounded-pill shadow-sm">Cancelled</span>
+      {% elif booking.status == 'completed' %}
+        <span class="badge bg-secondary px-4 py-2 fs-6 rounded-pill shadow-sm">Completed</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Left Column: Package and Itinerary Details -->
+    <div class="col-lg-8">
+      
+      <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+        <div class="row g-0">
+          <div class="col-md-4">
+            {% if booking.package.image %}
+              <img src="{{ booking.package.image.url }}" class="img-fluid h-100 object-fit-cover w-100" alt="{{ booking.package.name }}">
+            {% else %}
+              <div class="bg-secondary h-100 w-100 d-flex align-items-center justify-content-center text-white p-4">
+                <i class="fa-solid fa-image fs-1 opacity-50"></i>
+              </div>
+            {% endif %}
+          </div>
+          <div class="col-md-8">
+            <div class="card-body p-4">
+              <span class="badge bg-primary-subtle text-primary mb-2 px-3 py-1 rounded-pill">Tour Package</span>
+              <h3 class="fw-bold text-dark">{{ booking.package.name }}</h3>
+              <p class="text-muted mb-3"><i class="fa-solid fa-location-dot me-1"></i> {{ booking.package.destination.name }}</p>
+              
+              <div class="row g-3">
+                <div class="col-6">
+                  <div class="d-flex align-items-start gap-2">
+                    <i class="fa-regular fa-calendar-check text-primary mt-1"></i>
+                    <div>
+                      <small class="text-muted d-block lh-1">Start Date</small>
+                      <span class="fw-semibold">{{ booking.start_date|date:"M d, Y" }}</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="d-flex align-items-start gap-2">
+                    <i class="fa-regular fa-calendar-xmark text-primary mt-1"></i>
+                    <div>
+                      <small class="text-muted d-block lh-1">End Date</small>
+                      <span class="fw-semibold">{{ booking.end_date|date:"M d, Y" }}</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="d-flex align-items-start gap-2">
+                    <i class="fa-solid fa-users text-primary mt-1"></i>
+                    <div>
+                      <small class="text-muted d-block lh-1">Travelers</small>
+                      <span class="fw-semibold">{{ booking.persons }} Person{{ booking.persons|pluralize }}</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="d-flex align-items-start gap-2">
+                    <i class="fa-solid fa-bed text-primary mt-1"></i>
+                    <div>
+                      <small class="text-muted d-block lh-1">Rooms Needed</small>
+                      <span class="fw-semibold">{{ booking.rooms_required }} Room{{ booking.rooms_required|pluralize }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-4 mb-4">
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body p-4">
+              <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-hotel text-warning me-2"></i> Accommodation</h5>
+              {% if booking.hotel %}
+                <p class="fw-semibold mb-1">{{ booking.hotel.name }}</p>
+                <p class="text-muted small mb-2">{{ booking.hotel.location }}</p>
+                <span class="badge bg-light text-dark border">{{ booking.hotel.get_tier_display }} Tier</span>
+              {% else %}
+                <p class="text-muted mb-0">Standard Base Accommodation included in the package.</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body p-4">
+              <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-car text-info me-2"></i> Transportation</h5>
+              {% if booking.vehicle %}
+                <p class="fw-semibold mb-1">{{ booking.vehicle.name }}</p>
+                <p class="text-muted small mb-2">{{ booking.vehicle.seating_capacity }} Passengers Max</p>
+                <span class="badge bg-light text-dark border">{{ booking.vehicle.get_vehicle_type_display }}</span>
+              {% else %}
+                <p class="text-muted mb-0">Standard Group Transfer included in the package.</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right Column: Receipt and Actions -->
+    <div class="col-lg-4">
+      
+      <div class="card border-0 shadow-sm rounded-4 mb-4 position-relative overflow-hidden">
+        <div class="bg-primary pt-4 pb-5 px-4 text-white text-center rounded-top-4">
+          <h5 class="fw-bold text-white mb-0">Payment Receipt</h5>
+          <span class="small text-white-50 font-monospace">{{ booking.booking_reference }}</span>
+        </div>
+        
+        <div class="card-body px-4 pb-4 pt-0 position-relative" style="margin-top: -20px;">
+          <div class="bg-white rounded-3 shadow-sm p-4 mx-2">
+            
+            <div class="d-flex justify-content-between text-muted small py-1 mb-2">
+              <span>Date Booked</span>
+              <span class="fw-semibold text-dark">{{ booking.created_at|date:"M d, Y" }}</span>
+            </div>
+            
+            <hr class="text-muted my-3 opacity-25">
+            
+            <div class="d-flex justify-content-between text-muted small py-1">
+              <span>Package Base</span>
+              <span class="fw-semibold text-dark">&#8377;{{ booking.package_amount|floatformat:0 }}</span>
+            </div>
+            <div class="d-flex justify-content-between text-muted small py-1">
+              <span>Hotel Surcharge</span>
+              <span class="fw-semibold text-dark">&#8377;{{ booking.hotel_amount|floatformat:0 }}</span>
+            </div>
+            <div class="d-flex justify-content-between text-muted small py-1">
+              <span>Vehicle Surcharge</span>
+              <span class="fw-semibold text-dark">&#8377;{{ booking.vehicle_amount|floatformat:0 }}</span>
+            </div>
+            
+            {% if booking.seasonal_adjustment != 0 %}
+              <div class="d-flex justify-content-between text-muted small py-1">
+                <span>Seasonal Adjustment</span>
+                <span class="fw-semibold {% if booking.seasonal_adjustment > 0 %}text-danger{% else %}text-success{% endif %}">
+                  {% if booking.seasonal_adjustment > 0 %}+{% endif %}&#8377;{{ booking.seasonal_adjustment|floatformat:0 }}
+                </span>
+              </div>
+            {% endif %}
+            
+            <hr class="text-muted my-3 opacity-25">
+            
+            <div class="d-flex justify-content-between align-items-center py-1">
+              <span class="fw-semibold text-dark small">Subtotal</span>
+              <span class="fw-semibold text-dark">&#8377;{{ booking.subtotal|floatformat:0 }}</span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center py-1 mb-2">
+              <span class="text-muted small">GST (5%)</span>
+              <span class="fw-semibold text-muted small">&#8377;{{ booking.gst_amount|floatformat:0 }}</span>
+            </div>
+            
+            <div class="d-flex justify-content-between align-items-baseline mt-3 p-3 bg-light rounded-3 border">
+              <span class="fw-bold text-dark">Total</span>
+              <span class="fw-bold fs-4 text-primary font-heading">&#8377;{{ booking.grand_total|floatformat:0 }}</span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      {% if booking.status == 'pending' or booking.status == 'confirmed' %}
+        <div class="card border-danger shadow-sm rounded-4 mb-4 border-opacity-25">
+          <div class="card-body p-4 text-center">
+            <h6 class="fw-bold text-danger mb-2"><i class="fa-solid fa-triangle-exclamation me-1"></i> Cancel Booking</h6>
+            <p class="small text-muted mb-3">Cancellation may incur charges according to our policy. This action cannot be undone.</p>
+            
+            <button type="button" class="btn btn-outline-danger w-100 rounded-3" data-bs-toggle="modal" data-bs-target="#cancelModal">
+              Cancel This Booking
+            </button>
+          </div>
+        </div>
+
+        <!-- Cancel Confirmation Modal -->
+        <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+              <div class="modal-header bg-danger text-white border-0 py-3">
+                <h5 class="modal-title fw-bold" id="cancelModalLabel"><i class="fa-solid fa-circle-exclamation me-2"></i> Confirm Cancellation</h5>
+                <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body p-4">
+                <p>Are you sure you want to cancel your booking <strong>{{ booking.booking_reference }}</strong> for <strong>{{ booking.package.name }}</strong>?</p>
+                <p class="small text-muted mb-0">The booking amount (less any applicable cancellation fees) will be credited back to your original payment method within 5-7 business days.</p>
+              </div>
+              <div class="modal-footer border-0 p-4 pt-0">
+                <button type="button" class="btn btn-light rounded-3 px-4" data-bs-dismiss="modal">Keep Booking</button>
+                <form method="POST" action="{% url 'booking_cancel' booking.booking_reference %}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-danger rounded-3 px-4">Yes, Cancel It</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Explore Tour Packages | Tourism Management System{% endblock %}
+
+{% block content %}
+<!-- Catalog Hero Banner -->
+<section class="catalog-header-banner">
+  <div class="container position-relative">
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-white-50 text-decoration-none"><i class="fa-solid fa-house-chimney me-1"></i> Home</a></li>
+        <li class="breadcrumb-item active text-white" aria-current="page">Tour Packages</li>
+      </ol>
+    </nav>
+
+    <div class="row align-items-center gy-3">
+      <div class="col-lg-7">
+        <span class="badge bg-white-10 text-info fw-semibold px-3 py-1 rounded-pill mb-2 border border-white-20" style="background: rgba(255,255,255,0.15);">
+          <i class="fa-solid fa-suitcase-rolling me-1"></i> Curated Travel Packages
+        </span>
+        <h1 class="text-white fw-bold mb-2">Explore Tour Packages</h1>
+        <p class="text-white-50 mb-0">
+          Handcrafted multi-day itineraries with transparent base pricing, guided activities, meals, and full day-by-day schedules.
+        </p>
+      </div>
+
+      <div class="col-lg-5">
+        <!-- Search Form -->
+        <form method="get" action="{% url 'package_list' %}" class="bg-white p-2 rounded-3 shadow-lg d-flex gap-2">
+          {% if selected_category %}<input type="hidden" name="category" value="{{ selected_category.slug }}">{% endif %}
+          {% if selected_destination %}<input type="hidden" name="destination" value="{{ selected_destination.id }}">{% endif %}
+          {% if sort_option %}<input type="hidden" name="sort" value="{{ sort_option }}">{% endif %}
+          <div class="input-group border-0">
+            <span class="input-group-text bg-transparent border-0 text-muted ps-2"><i class="fa-solid fa-magnifying-glass"></i></span>
+            <input type="text" name="q" value="{{ query }}" class="form-control border-0 shadow-none ps-1" placeholder="Search packages, destinations, inclusions..." aria-label="Search tour packages">
+          </div>
+          <button type="submit" class="btn btn-primary-tms px-4 flex-shrink-0">
+            Search
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Filter & Search Controls Bar -->
+<section class="py-4 bg-white border-bottom">
+  <div class="container">
+    <form method="get" action="{% url 'package_list' %}" id="filterForm" class="row g-3 align-items-center">
+      {% if query %}
+        <input type="hidden" name="q" value="{{ query }}">
+      {% endif %}
+
+      <!-- Category Filter -->
+      <div class="col-md-4 col-lg-3">
+        <label class="form-label small text-muted fw-bold mb-1"><i class="fa-solid fa-layer-group me-1 text-primary"></i> Category</label>
+        <select name="category" class="form-select border-1 rounded-3" onchange="document.getElementById('filterForm').submit();">
+          <option value="">All Categories</option>
+          {% for cat in categories %}
+            <option value="{{ cat.slug }}" {% if selected_category and selected_category.id == cat.id %}selected{% endif %}>
+              {{ cat.name }} ({{ cat.active_destinations_count }})
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Destination Filter -->
+      <div class="col-md-4 col-lg-4">
+        <label class="form-label small text-muted fw-bold mb-1"><i class="fa-solid fa-location-dot me-1 text-primary"></i> Destination</label>
+        <select name="destination" class="form-select border-1 rounded-3" onchange="document.getElementById('filterForm').submit();">
+          <option value="">All Destinations</option>
+          {% for dest in destinations %}
+            <option value="{{ dest.id }}" {% if selected_destination and selected_destination.id == dest.id %}selected{% endif %}>
+              {{ dest.name }} ({{ dest.location }})
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Sorting Filter -->
+      <div class="col-md-4 col-lg-3">
+        <label class="form-label small text-muted fw-bold mb-1"><i class="fa-solid fa-arrow-down-short-wide me-1 text-primary"></i> Sort By</label>
+        <select name="sort" class="form-select border-1 rounded-3" onchange="document.getElementById('filterForm').submit();">
+          <option value="price_asc" {% if sort_option == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+          <option value="price_desc" {% if sort_option == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+          <option value="duration_asc" {% if sort_option == 'duration_asc' %}selected{% endif %}>Duration: Shortest First</option>
+          <option value="duration_desc" {% if sort_option == 'duration_desc' %}selected{% endif %}>Duration: Longest First</option>
+          <option value="name_asc" {% if sort_option == 'name_asc' %}selected{% endif %}>Package Name: A to Z</option>
+        </select>
+      </div>
+
+      <!-- Reset Button -->
+      <div class="col-md-12 col-lg-2 text-lg-end mt-lg-4">
+        <a href="{% url 'package_list' %}" class="btn btn-outline-secondary w-100 rounded-3">
+          <i class="fa-solid fa-rotate-left me-1"></i> Reset
+        </a>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- Package Results Section -->
+<section class="py-5">
+  <div class="container">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <div class="text-muted small">
+        Found <strong class="text-dark">{{ total_count }}</strong> tour package{{ total_count|pluralize }}
+        {% if selected_destination %}
+          in <span class="badge bg-primary-subtle text-primary">{{ selected_destination.name }}</span>
+        {% endif %}
+        {% if selected_category %}
+          under <span class="badge bg-info-subtle text-info-emphasis">{{ selected_category.name }}</span>
+        {% endif %}
+        {% if query %}
+          matching "<span class="text-primary fw-semibold">{{ query }}</span>"
+        {% endif %}
+      </div>
+    </div>
+
+    {% if packages %}
+      <div class="row g-4">
+        {% for pkg in packages %}
+          <div class="col-md-6 col-lg-4">
+            <div class="package-card">
+              <div class="package-img-box">
+                {% if pkg.image %}
+                  <img src="{{ pkg.image.url }}" alt="{{ pkg.name }}">
+                {% else %}
+                  <div class="destination-img-placeholder">
+                    <i class="fa-solid {{ pkg.destination.category.icon }} fs-1 mb-2"></i>
+                    <span class="fw-semibold small">{{ pkg.destination.name }}</span>
+                  </div>
+                {% endif %}
+
+                <div class="package-duration-badge">
+                  <i class="fa-solid fa-clock me-1"></i> {{ pkg.duration }}
+                </div>
+
+                <div class="package-destination-badge">
+                  <i class="fa-solid fa-location-dot me-1"></i> {{ pkg.destination.name }}
+                </div>
+              </div>
+
+              <div class="package-card-body">
+                <div class="d-flex align-items-center gap-1 text-muted small mb-1">
+                  <i class="fa-solid {{ pkg.destination.category.icon }} text-primary"></i> {{ pkg.destination.category.name }} &bull; {{ pkg.destination.location }}
+                </div>
+                <h4 class="fw-bold mb-2">
+                  <a href="{% url 'package_detail' pkg.id %}" class="text-dark text-decoration-none">
+                    {{ pkg.name }}
+                  </a>
+                </h4>
+                <p class="text-muted small mb-3 flex-grow-1">
+                  {{ pkg.description|truncatewords:20 }}
+                </p>
+
+                <!-- Inclusions Preview -->
+                {% with incs=pkg.get_inclusions_list %}
+                  {% if incs %}
+                    <div class="mb-3">
+                      {% for inc in incs|slice:":2" %}
+                        <div class="small text-muted text-truncate mb-1">
+                          <i class="fa-solid fa-check text-success me-1"></i> {{ inc }}
+                        </div>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                {% endwith %}
+              </div>
+
+              <div class="package-price-box">
+                <div>
+                  <span class="price-sub">Base Price (Per Person)</span>
+                  <div class="price-display text-primary">&#8377; {{ pkg.base_price|floatformat:0 }}</div>
+                </div>
+                <a href="{% url 'package_detail' pkg.id %}" class="btn btn-primary-tms btn-sm">
+                  View Details <i class="fa-solid fa-arrow-right ms-1"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <!-- Empty State -->
+      <div class="card border-0 shadow-sm p-5 text-center my-4 bg-white rounded-4">
+        <div class="p-3 bg-light rounded-circle d-inline-block mx-auto mb-3 text-muted" style="width: 70px; height: 70px; display: flex; align-items: center; justify-content: center;">
+          <i class="fa-solid fa-suitcase-rolling fs-2 text-primary"></i>
+        </div>
+        <h4 class="fw-bold text-dark mb-2">No Tour Packages Match Your Criteria</h4>
+        <p class="text-muted max-w-md mx-auto mb-4">
+          We couldn't find any packages matching the selected destination, category, or search keywords. Try adjusting your filters.
+        </p>
+        <div>
+          <a href="{% url 'package_list' %}" class="btn btn-primary-tms px-4">
+            <i class="fa-solid fa-arrows-rotate me-1"></i> View All Packages
+          </a>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

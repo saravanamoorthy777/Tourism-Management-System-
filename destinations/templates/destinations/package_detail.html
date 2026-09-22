@@ -1,0 +1,597 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ package.name }} | {{ destination.name }} Tour Package{% endblock %}
+
+{% block content %}
+<!-- Package Header Banner -->
+<section class="catalog-header-banner">
+  <div class="container position-relative">
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-white-50 text-decoration-none"><i class="fa-solid fa-house-chimney me-1"></i> Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'package_list' %}" class="text-white-50 text-decoration-none">Tour Packages</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'destination_detail' destination.id %}" class="text-white-50 text-decoration-none">{{ destination.name }}</a></li>
+        <li class="breadcrumb-item active text-white text-truncate max-w-sm" aria-current="page">{{ package.name }}</li>
+      </ol>
+    </nav>
+
+    <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+      <span class="badge bg-primary text-white fw-semibold px-3 py-1 rounded-pill">
+        <i class="fa-solid {{ destination.category.icon }} me-1"></i> {{ destination.category.name }}
+      </span>
+      <span class="badge bg-white-10 text-info fw-semibold px-3 py-1 rounded-pill" style="background: rgba(255,255,255,0.15);">
+        <i class="fa-solid fa-clock me-1"></i> {{ package.duration }}
+      </span>
+      <span class="badge bg-white-10 text-white-50 px-3 py-1 rounded-pill" style="background: rgba(255,255,255,0.15);">
+        <i class="fa-solid fa-calendar-check me-1"></i> Updated {{ package.updated_at|date:"M Y" }}
+      </span>
+    </div>
+
+    <h1 class="text-white fw-bold display-5 mb-2">{{ package.name }}</h1>
+    <p class="text-white-50 fs-5 mb-0">
+      <i class="fa-solid fa-location-dot text-info me-1"></i>
+      <a href="{% url 'destination_detail' destination.id %}" class="text-info text-decoration-none">
+        {{ destination.name }}
+      </a>
+      &bull; {{ destination.location }}
+    </p>
+  </div>
+</section>
+
+<!-- Package Body Content -->
+<section class="py-5">
+  <div class="container">
+    <div class="row g-4">
+      <!-- Main Content Column -->
+      <div class="col-lg-8">
+        <!-- Overview Card -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+          <h3 class="fw-bold mb-3 text-dark">Package Overview</h3>
+          <p class="text-muted leading-relaxed mb-0" style="font-size: 1.05rem; white-space: pre-line;">
+            {{ package.description }}
+          </p>
+        </div>
+
+        <!-- Inclusions and Exclusions -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+          <h3 class="fw-bold mb-3 text-dark">What's Included & Excluded</h3>
+          
+          <div class="row g-4">
+            <!-- Inclusions -->
+            <div class="col-md-6">
+              <div class="p-3 bg-success-subtle rounded-3 border border-success-subtle h-100">
+                <h5 class="fw-bold text-success mb-3">
+                  <i class="fa-solid fa-circle-check me-2"></i> Package Inclusions
+                </h5>
+                {% with incs=package.get_inclusions_list %}
+                  {% if incs %}
+                    <ul class="list-unstyled mb-0">
+                      {% for inc in incs %}
+                        <li class="inclusion-item">
+                          <i class="fa-solid fa-check text-success mt-1"></i>
+                          <span>{{ inc }}</span>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  {% else %}
+                    <p class="text-muted small mb-0">Standard transportation and guided sightseeing included.</p>
+                  {% endif %}
+                {% endwith %}
+              </div>
+            </div>
+
+            <!-- Exclusions -->
+            <div class="col-md-6">
+              <div class="p-3 bg-danger-subtle rounded-3 border border-danger-subtle h-100">
+                <h5 class="fw-bold text-danger mb-3">
+                  <i class="fa-solid fa-circle-xmark me-2"></i> Package Exclusions
+                </h5>
+                {% with excs=package.get_exclusions_list %}
+                  {% if excs %}
+                    <ul class="list-unstyled mb-0">
+                      {% for exc in excs %}
+                        <li class="exclusion-item">
+                          <i class="fa-solid fa-xmark text-danger mt-1"></i>
+                          <span>{{ exc }}</span>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  {% else %}
+                    <p class="text-muted small mb-0">Personal expenses, flights, and extra meals not specified.</p>
+                  {% endif %}
+                {% endwith %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Day-by-Day Itinerary -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+          <div class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom">
+            <div>
+              <span class="section-tagline">Day-By-Day Schedule</span>
+              <h3 class="fw-bold text-dark mb-0">Detailed Tour Itinerary</h3>
+            </div>
+            <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill fw-semibold">
+              {{ itineraries.count }} Day{{ itineraries.count|pluralize }} Schedule
+            </span>
+          </div>
+
+          {% if itineraries %}
+            <div class="itinerary-timeline">
+              {% for day in itineraries %}
+                <div class="itinerary-item">
+                  <div class="itinerary-day-badge">
+                    {{ day.day_number }}
+                  </div>
+                  <div class="itinerary-content">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+                      <h5 class="fw-bold text-dark mb-0">Day {{ day.day_number }}: {{ day.title }}</h5>
+                      <span class="badge bg-light text-muted border px-2 py-1 small">Day {{ day.day_number }} of {{ package.duration_days }}</span>
+                    </div>
+
+                    <p class="text-muted small leading-relaxed mb-3">
+                      {{ day.description }}
+                    </p>
+
+                    <!-- Activities Tags -->
+                    {% with acts=day.get_activities_list %}
+                      {% if acts %}
+                        <div class="pt-2 border-top">
+                          <span class="small fw-bold text-dark me-2"><i class="fa-solid fa-wand-magic-sparkles text-warning me-1"></i> Key Activities:</span>
+                          <div class="d-inline-flex flex-wrap gap-1 mt-1">
+                            {% for act in acts %}
+                              <span class="badge bg-light text-secondary border fw-normal">{{ act }}</span>
+                            {% endfor %}
+                          </div>
+                        </div>
+                      {% endif %}
+                    {% endwith %}
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="p-4 bg-light text-center rounded-3 text-muted">
+              <i class="fa-solid fa-calendar-lines-pen fs-2 mb-2"></i>
+              <h6 class="fw-bold">Daily Itinerary Outline Under Revision</h6>
+              <p class="small mb-0">Please contact our travel desk for the custom day-wise schedule of this package.</p>
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Other Packages for Destination -->
+        {% if other_packages %}
+          <div class="mb-4">
+            <h4 class="fw-bold text-dark mb-3">Other Packages in {{ destination.name }}</h4>
+            <div class="row g-3">
+              {% for other in other_packages %}
+                <div class="col-md-6">
+                  <div class="card border-0 shadow-sm rounded-3 p-3 bg-white h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <span class="badge bg-light text-muted border">{{ other.duration }}</span>
+                      <span class="fw-bold text-primary">&#8377; {{ other.base_price|floatformat:0 }}</span>
+                    </div>
+                    <h6 class="fw-bold mb-1">
+                      <a href="{% url 'package_detail' other.id %}" class="text-dark text-decoration-none">
+                        {{ other.name }}
+                      </a>
+                    </h6>
+                    <p class="text-muted small mb-2">{{ other.description|truncatewords:12 }}</p>
+                    <a href="{% url 'package_detail' other.id %}" class="btn btn-outline-tms btn-sm mt-auto">
+                      View Details
+                    </a>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Dynamic Cost Calculator Column -->
+      <div class="col-lg-4">
+        <div class="sticky-pricing-card shadow-sm border-0 bg-white rounded-4 p-4">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <span class="badge bg-primary-subtle text-primary fw-bold px-3 py-1 rounded-pill">
+              <i class="fa-solid fa-calculator me-1"></i> Cost Calculator
+            </span>
+            <span class="text-muted small font-monospace">#PKG-{{ package.id|stringformat:"04d" }}</span>
+          </div>
+
+          <div class="mb-3">
+            <span class="price-sub">Base Tour Tariff</span>
+            <div class="d-flex align-items-baseline gap-1">
+              <span class="display-6 fw-bold text-primary font-heading" id="displayBasePrice">&#8377; {{ package.base_price|floatformat:0 }}</span>
+              <span class="text-muted small">/ person</span>
+            </div>
+            <small class="text-muted d-block mt-1">
+              *Includes {{ package.duration }} standard itinerary & guided activities
+            </small>
+          </div>
+
+          <hr class="my-3">
+
+          <!-- Calculator Form -->
+          <form id="tourCalculatorForm" method="POST" action="{% url 'booking_review' %}">
+            {% csrf_token %}
+            <input type="hidden" name="package_id" value="{{ package.id }}">
+            <!-- Group Size (Persons) -->
+            <div class="mb-3">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <label for="calcPersons" class="form-label small fw-bold text-dark mb-0">
+                  <i class="fa-solid fa-users text-primary me-1"></i> Number of Persons
+                </label>
+                <span class="badge bg-light text-secondary border small" id="badgeRoomsNeeded">
+                  1 Room Required
+                </span>
+              </div>
+              <div class="input-group">
+                <button type="button" class="btn btn-outline-secondary" id="btnDecPersons" style="width: 42px;">-</button>
+                <input type="number" id="calcPersons" name="persons" class="form-control text-center fw-bold shadow-none" value="2" min="1" max="50">
+                <button type="button" class="btn btn-outline-secondary" id="btnIncPersons" style="width: 42px;">+</button>
+              </div>
+              <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">
+                Standard double occupancy: ceil(persons / 2) rooms
+              </small>
+            </div>
+
+            <!-- Travel Dates -->
+            <div class="row g-2 mb-3">
+              <div class="col-6">
+                <label for="calcStartDate" class="form-label small fw-bold text-dark mb-1">
+                  <i class="fa-solid fa-calendar text-primary me-1"></i> Start Date
+                </label>
+                <input type="date" id="calcStartDate" name="start_date" class="form-control form-control-sm rounded-2 shadow-none" value="{{ default_start_date }}">
+              </div>
+              <div class="col-6">
+                <label for="calcEndDate" class="form-label small fw-bold text-dark mb-1">
+                  <i class="fa-solid fa-calendar-check text-success me-1"></i> End Date
+                </label>
+                <input type="date" id="calcEndDate" name="end_date" class="form-control form-control-sm rounded-2 shadow-none" value="{{ default_end_date }}">
+              </div>
+              <div class="col-12">
+                <div class="d-flex justify-content-between text-muted small" style="font-size: 0.75rem;">
+                  <span>Duration: <strong id="calcDurationText">{{ package.duration_days }} Days / {{ default_nights }} Nights</strong></span>
+                  <span id="seasonIndicator" class="badge bg-light text-dark border">Checking season...</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Hotel Tier Selection -->
+            <div class="mb-3">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <label for="calcHotel" class="form-label small fw-bold text-dark mb-0">
+                  <i class="fa-solid fa-hotel text-warning me-1"></i> Hotel Accommodation
+                </label>
+                <a href="{% url 'hotel_list' %}?destination={{ destination.id }}" target="_blank" class="small text-primary text-decoration-none" style="font-size: 0.75rem;">
+                  View Hotels <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </a>
+              </div>
+              <select id="calcHotel" name="hotel_id" class="form-select form-select-sm rounded-2 shadow-none">
+                <option value="" data-price="0" data-rooms="999" data-name="Base Accommodation">
+                  -- No Hotel Surcharge (Base Standard) --
+                </option>
+                {% for h in hotels %}
+                  <option value="{{ h.id }}" data-price="{{ h.price_per_night }}" data-rooms="{{ h.available_rooms }}" data-name="{{ h.name }}" data-tier="{{ h.get_tier_display }}">
+                    {{ h.name }} ({{ h.get_tier_display }} &bull; +&#8377;{{ h.price_per_night|floatformat:0 }}/nt)
+                  </option>
+                {% empty %}
+                  <option value="" disabled>No partner hotels currently listed for this destination</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <!-- Vehicle Selection -->
+            <div class="mb-3">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <label for="calcVehicle" class="form-label small fw-bold text-dark mb-0">
+                  <i class="fa-solid fa-car text-info me-1"></i> Dedicated Vehicle
+                </label>
+                <a href="{% url 'vehicle_list' %}" target="_blank" class="small text-primary text-decoration-none" style="font-size: 0.75rem;">
+                  View Fleet <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </a>
+              </div>
+              <select id="calcVehicle" name="vehicle_id" class="form-select form-select-sm rounded-2 shadow-none">
+                <option value="" data-rate="0" data-capacity="999" data-name="Standard Transfer">
+                  -- No Dedicated Vehicle (Standard Sightseeing) --
+                </option>
+                {% for v in vehicles %}
+                  <option value="{{ v.id }}" data-rate="{{ v.rate_per_day }}" data-capacity="{{ v.seating_capacity }}" data-name="{{ v.name }}" data-type="{{ v.get_vehicle_type_display }}">
+                    {{ v.name }} ({{ v.get_vehicle_type_display }} &bull; {{ v.seating_capacity }} seats &bull; +&#8377;{{ v.rate_per_day|floatformat:0 }}/day)
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+          </form>
+
+          <!-- Error Alert Container -->
+          <div id="calcErrorBox" class="alert alert-danger p-2 small mb-3 d-none rounded-3" role="alert">
+            <i class="fa-solid fa-triangle-exclamation me-1"></i> <span id="calcErrorText"></span>
+          </div>
+
+          <!-- Cost Breakdown Card -->
+          <div class="bg-light p-3 rounded-3 border mb-3">
+            <h6 class="fw-bold text-dark mb-2 pb-1 border-bottom small text-uppercase tracking-wider">
+              <i class="fa-solid fa-receipt text-primary me-1"></i> Cost Breakdown
+            </h6>
+
+            <!-- Line: Package Base -->
+            <div class="d-flex justify-content-between text-muted small py-1">
+              <span>
+                Package Base (<span id="lineBasePersons">2</span> &times; &#8377;{{ package.base_price|floatformat:0 }})
+              </span>
+              <span class="fw-bold text-dark">&#8377; <span id="linePackageBase">0</span></span>
+            </div>
+
+            <!-- Line: Hotel Cost -->
+            <div class="d-flex justify-content-between text-muted small py-1">
+              <span>
+                Hotel (<span id="lineHotelDetails">None</span>)
+              </span>
+              <span class="fw-bold text-dark">&#8377; <span id="lineHotelCost">0</span></span>
+            </div>
+
+            <!-- Line: Vehicle Cost -->
+            <div class="d-flex justify-content-between text-muted small py-1">
+              <span>
+                Vehicle (<span id="lineVehicleDetails">None</span>)
+              </span>
+              <span class="fw-bold text-dark">&#8377; <span id="lineVehicleCost">0</span></span>
+            </div>
+
+            <!-- Line: Seasonal Adjustment -->
+            <div class="d-flex justify-content-between text-muted small py-1" id="rowSeasonAdjustment">
+              <span>
+                Seasonal Adjustment (<span id="lineSeasonFactor">1.0x</span>)
+              </span>
+              <span class="fw-bold" id="lineSeasonAdjustmentColor">&#8377; <span id="lineSeasonAdjustment">0</span></span>
+            </div>
+
+            <!-- Line: Subtotal -->
+            <div class="d-flex justify-content-between text-muted small py-1 border-top mt-1 pt-2">
+              <span class="fw-semibold">Subtotal</span>
+              <span class="fw-bold text-dark">&#8377; <span id="lineSubtotal">0</span></span>
+            </div>
+
+            <!-- Line: GST (5%) -->
+            <div class="d-flex justify-content-between text-muted small py-1">
+              <span>GST (5% of Subtotal)</span>
+              <span class="fw-bold text-dark">&#8377; <span id="lineGst">0</span></span>
+            </div>
+
+            <!-- Total -->
+            <div class="d-flex justify-content-between align-items-baseline border-top mt-2 pt-2">
+              <span class="fw-bold text-dark fs-6">Estimated Total</span>
+              <span class="fw-bold fs-4 text-primary font-heading">&#8377; <span id="lineGrandTotal">0</span></span>
+            </div>
+          </div>
+
+          <button type="submit" form="tourCalculatorForm" class="btn btn-primary-tms w-100 py-3 fw-bold rounded-3 mb-2 shadow-sm">
+            <i class="fa-solid fa-suitcase-rolling me-1"></i> Book This Tour
+          </button>
+
+          <a href="{% url 'package_list' %}" class="btn btn-outline-secondary w-100 rounded-3 btn-sm">
+            <i class="fa-solid fa-arrow-left me-1"></i> Back to All Packages
+          </a>
+        </div>
+      </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const packageId = {{ package.id }};
+  const packageBasePrice = {{ package.base_price }};
+  const packageDurationDays = {{ package.duration_days }};
+
+  const calcPersons = document.getElementById('calcPersons');
+  const btnDecPersons = document.getElementById('btnDecPersons');
+  const btnIncPersons = document.getElementById('btnIncPersons');
+  const badgeRoomsNeeded = document.getElementById('badgeRoomsNeeded');
+
+  const calcStartDate = document.getElementById('calcStartDate');
+  const calcEndDate = document.getElementById('calcEndDate');
+  const calcDurationText = document.getElementById('calcDurationText');
+  const seasonIndicator = document.getElementById('seasonIndicator');
+
+  const calcHotel = document.getElementById('calcHotel');
+  const calcVehicle = document.getElementById('calcVehicle');
+
+  const calcErrorBox = document.getElementById('calcErrorBox');
+  const calcErrorText = document.getElementById('calcErrorText');
+
+  const lineBasePersons = document.getElementById('lineBasePersons');
+  const linePackageBase = document.getElementById('linePackageBase');
+  const lineHotelDetails = document.getElementById('lineHotelDetails');
+  const lineHotelCost = document.getElementById('lineHotelCost');
+  const lineVehicleDetails = document.getElementById('lineVehicleDetails');
+  const lineVehicleCost = document.getElementById('lineVehicleCost');
+  const lineSeasonFactor = document.getElementById('lineSeasonFactor');
+  const lineSeasonAdjustment = document.getElementById('lineSeasonAdjustment');
+  const lineSeasonAdjustmentColor = document.getElementById('lineSeasonAdjustmentColor');
+  const lineSubtotal = document.getElementById('lineSubtotal');
+  const lineGst = document.getElementById('lineGst');
+  const lineGrandTotal = document.getElementById('lineGrandTotal');
+
+  let activeFetchController = null;
+
+  // Person increment / decrement
+  btnDecPersons.addEventListener('click', function () {
+    let p = parseInt(calcPersons.value) || 1;
+    if (p > 1) {
+      calcPersons.value = p - 1;
+      updateCalculation();
+    }
+  });
+
+  btnIncPersons.addEventListener('click', function () {
+    let p = parseInt(calcPersons.value) || 1;
+    calcPersons.value = p + 1;
+    updateCalculation();
+  });
+
+  calcPersons.addEventListener('input', updateCalculation);
+
+  // Auto adjust end date when start date changes
+  calcStartDate.addEventListener('change', function () {
+    if (calcStartDate.value) {
+      const parts = calcStartDate.value.split('-');
+      const start = new Date(parts[0], parts[1] - 1, parts[2]);
+      const nights = Math.max(1, packageDurationDays - 1);
+      start.setDate(start.getDate() + nights);
+      
+      const y = start.getFullYear();
+      const m = String(start.getMonth() + 1).padStart(2, '0');
+      const d = String(start.getDate()).padStart(2, '0');
+      calcEndDate.value = `${y}-${m}-${d}`;
+    }
+    updateCalculation();
+  });
+
+  calcEndDate.addEventListener('change', updateCalculation);
+  calcHotel.addEventListener('change', updateCalculation);
+  calcVehicle.addEventListener('change', updateCalculation);
+
+  function showError(msg) {
+    calcErrorText.textContent = msg;
+    calcErrorBox.classList.remove('d-none');
+  }
+
+  function clearError() {
+    calcErrorBox.classList.add('d-none');
+    calcErrorText.textContent = '';
+  }
+
+  function updateCalculation() {
+    clearError();
+
+    const persons = parseInt(calcPersons.value);
+    if (isNaN(persons) || persons <= 0) {
+      showError("Number of persons must be at least 1.");
+      return;
+    }
+
+    const roomsNeeded = Math.ceil(persons / 2);
+    badgeRoomsNeeded.textContent = `${roomsNeeded} Room${roomsNeeded > 1 ? 's' : ''} Required`;
+    lineBasePersons.textContent = persons;
+
+    const startDateStr = calcStartDate.value;
+    const endDateStr = calcEndDate.value;
+
+    if (!startDateStr || !endDateStr) {
+      showError("Please specify both travel start and end dates.");
+      return;
+    }
+
+    const sParts = startDateStr.split('-');
+    const eParts = endDateStr.split('-');
+    const sDate = new Date(sParts[0], sParts[1] - 1, sParts[2]);
+    const eDate = new Date(eParts[0], eParts[1] - 1, eParts[2]);
+
+    if (eDate < sDate) {
+      showError("Travel end date cannot be earlier than start date.");
+      return;
+    }
+
+    const diffTime = eDate - sDate;
+    const calendarNights = Math.round(diffTime / (1000 * 60 * 60 * 24));
+    const calendarDays = calendarNights > 0 ? calendarNights + 1 : 1;
+    calcDurationText.textContent = `${calendarDays} Days / ${calendarNights} Nights`;
+
+    // Check hotel availability & capacity
+    const selectedHotelOpt = calcHotel.options[calcHotel.selectedIndex];
+    const hotelPrice = parseFloat(selectedHotelOpt.getAttribute('data-price')) || 0;
+    const hotelRoomsAvail = parseInt(selectedHotelOpt.getAttribute('data-rooms')) || 999;
+    const hotelId = calcHotel.value;
+
+    if (hotelId && hotelRoomsAvail < roomsNeeded) {
+      showError(`Selected hotel only has ${hotelRoomsAvail} room(s) available, but ${roomsNeeded} room(s) are required.`);
+      return;
+    }
+
+    // Check vehicle capacity
+    const selectedVehOpt = calcVehicle.options[calcVehicle.selectedIndex];
+    const vehicleRate = parseFloat(selectedVehOpt.getAttribute('data-rate')) || 0;
+    const vehicleCapacity = parseInt(selectedVehOpt.getAttribute('data-capacity')) || 999;
+    const vehicleId = calcVehicle.value;
+
+    if (vehicleId && vehicleCapacity < persons) {
+      showError(`Selected vehicle seats ${vehicleCapacity} passengers, but your group is ${persons} persons.`);
+      return;
+    }
+
+    // Fast Client-side calculation while fetching from API
+    const nightsForHotel = calendarNights > 0 ? calendarNights : Math.max(1, packageDurationDays - 1);
+    const pkgBase = packageBasePrice * persons;
+    const hotelCost = hotelId ? (hotelPrice * nightsForHotel * roomsNeeded) : 0;
+    const vehicleCost = vehicleId ? (vehicleRate * calendarDays) : 0;
+    const rawSubtotal = pkgBase + hotelCost + vehicleCost;
+
+    linePackageBase.textContent = Math.round(pkgBase).toLocaleString('en-IN');
+    lineHotelCost.textContent = Math.round(hotelCost).toLocaleString('en-IN');
+    lineVehicleCost.textContent = Math.round(vehicleCost).toLocaleString('en-IN');
+
+    lineHotelDetails.textContent = hotelId ? `${roomsNeeded}R × ${nightsForHotel}N` : 'None';
+    lineVehicleDetails.textContent = vehicleId ? `${calendarDays} Days` : 'None';
+
+    // Server-side authoritative API call
+    if (activeFetchController) {
+      activeFetchController.abort();
+    }
+    activeFetchController = new AbortController();
+
+    const apiUrl = `{% url 'calculate_price_api' %}?package_id=${packageId}&persons=${persons}&start_date=${startDateStr}&end_date=${endDateStr}&hotel_id=${hotelId || ''}&vehicle_id=${vehicleId || ''}`;
+
+    fetch(apiUrl, { signal: activeFetchController.signal })
+      .then(res => res.json())
+      .then(data => {
+        if (!data.success) {
+          showError(data.error || "Cost calculation error");
+          return;
+        }
+
+        clearError();
+        linePackageBase.textContent = Math.round(data.package_base).toLocaleString('en-IN');
+        lineHotelCost.textContent = Math.round(data.hotel_cost).toLocaleString('en-IN');
+        lineVehicleCost.textContent = Math.round(data.vehicle_cost).toLocaleString('en-IN');
+
+        // Seasonal details
+        lineSeasonFactor.textContent = `${data.seasonal_multiplier}x (${data.season_name})`;
+        const adj = data.seasonal_adjustment;
+        if (adj > 0) {
+          lineSeasonAdjustment.textContent = `+${Math.round(adj).toLocaleString('en-IN')}`;
+          lineSeasonAdjustmentColor.className = "fw-bold text-danger";
+          seasonIndicator.className = "badge bg-warning-subtle text-dark border";
+          seasonIndicator.innerHTML = `<i class="fa-solid fa-fire me-1 text-danger"></i> ${data.season_name}`;
+        } else if (adj < 0) {
+          lineSeasonAdjustment.textContent = `-${Math.round(Math.abs(adj)).toLocaleString('en-IN')}`;
+          lineSeasonAdjustmentColor.className = "fw-bold text-success";
+          seasonIndicator.className = "badge bg-success-subtle text-success border";
+          seasonIndicator.innerHTML = `<i class="fa-solid fa-tag me-1"></i> ${data.season_name} Discount`;
+        } else {
+          lineSeasonAdjustment.textContent = "0";
+          lineSeasonAdjustmentColor.className = "fw-bold text-muted";
+          seasonIndicator.className = "badge bg-light text-secondary border";
+          seasonIndicator.textContent = data.season_name;
+        }
+
+        lineSubtotal.textContent = Math.round(data.subtotal).toLocaleString('en-IN');
+        lineGst.textContent = Math.round(data.gst).toLocaleString('en-IN');
+        lineGrandTotal.textContent = Math.round(data.total).toLocaleString('en-IN');
+      })
+      .catch(err => {
+        if (err.name !== 'AbortError') {
+          console.error("API error:", err);
+        }
+      });
+  }
+
+  // Initial calculation trigger
+  updateCalculation();
+});
+</script>
+
+    </div>
+  </div>
+</section>
+{% endblock %}

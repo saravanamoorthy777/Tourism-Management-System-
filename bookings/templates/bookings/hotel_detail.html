@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ hotel.name }} | Hotel Details | Tourism Management System{% endblock %}
+
+{% block content %}
+<!-- Header Banner -->
+<section class="catalog-header-banner">
+  <div class="container position-relative">
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-white-50 text-decoration-none"><i class="fa-solid fa-house-chimney me-1"></i> Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'hotel_list' %}" class="text-white-50 text-decoration-none">Hotels</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'destination_detail' hotel.destination.id %}" class="text-white-50 text-decoration-none">{{ hotel.destination.name }}</a></li>
+        <li class="breadcrumb-item active text-white text-truncate max-w-sm" aria-current="page">{{ hotel.name }}</li>
+      </ol>
+    </nav>
+
+    <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+      {% if hotel.tier == 'premium' %}
+        <span class="badge bg-warning text-dark fw-bold px-3 py-1 rounded-pill">
+          <i class="fa-solid fa-crown me-1"></i> Premium 5-Star Tier
+        </span>
+      {% elif hotel.tier == 'deluxe' %}
+        <span class="badge bg-primary text-white fw-bold px-3 py-1 rounded-pill">
+          <i class="fa-solid fa-star me-1"></i> Deluxe 4-Star Tier
+        </span>
+      {% else %}
+        <span class="badge bg-secondary text-white fw-bold px-3 py-1 rounded-pill">
+          <i class="fa-solid fa-shield me-1"></i> Standard Tier
+        </span>
+      {% endif %}
+      <span class="badge bg-white-10 text-info fw-semibold px-3 py-1 rounded-pill" style="background: rgba(255,255,255,0.15);">
+        <i class="fa-solid fa-bed me-1"></i> {{ hotel.room_type }}
+      </span>
+      <span class="badge bg-white-10 text-white-50 px-3 py-1 rounded-pill" style="background: rgba(255,255,255,0.15);">
+        <i class="fa-solid fa-door-open me-1"></i> {{ hotel.available_rooms }} Rooms Available
+      </span>
+    </div>
+
+    <h1 class="text-white fw-bold display-5 mb-2">{{ hotel.name }}</h1>
+    <p class="text-white-50 fs-5 mb-0">
+      <i class="fa-solid fa-location-dot text-info me-1"></i>
+      {{ hotel.location|default:hotel.destination.location }} &bull;
+      <a href="{% url 'destination_detail' hotel.destination.id %}" class="text-info text-decoration-none">
+        Explore {{ hotel.destination.name }}
+      </a>
+    </p>
+  </div>
+</section>
+
+<!-- Content Section -->
+<section class="py-5">
+  <div class="container">
+    <div class="row g-4">
+      <!-- Main Details Column -->
+      <div class="col-lg-8">
+        <!-- Overview Card -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+          <h3 class="fw-bold mb-3 text-dark">Hotel Overview & Hospitality</h3>
+          <p class="text-muted leading-relaxed mb-4" style="font-size: 1.05rem; white-space: pre-line;">
+            {{ hotel.description }}
+          </p>
+
+          <h5 class="fw-bold text-dark mb-3">Room Specifications & Amenities</h5>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="p-3 bg-light rounded-3 border">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="p-2 rounded-circle bg-primary-subtle text-primary">
+                    <i class="fa-solid fa-bed fs-5"></i>
+                  </div>
+                  <div>
+                    <span class="small text-muted d-block">Room Category</span>
+                    <strong class="text-dark">{{ hotel.room_type }}</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="p-3 bg-light rounded-3 border">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="p-2 rounded-circle bg-success-subtle text-success">
+                    <i class="fa-solid fa-users fs-5"></i>
+                  </div>
+                  <div>
+                    <span class="small text-muted d-block">Occupancy Standard</span>
+                    <strong class="text-dark">2 Adults / Room (Double Occupancy)</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="p-3 bg-light rounded-3 border">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="p-2 rounded-circle bg-info-subtle text-info">
+                    <i class="fa-solid fa-wifi fs-5"></i>
+                  </div>
+                  <div>
+                    <span class="small text-muted d-block">Connectivity</span>
+                    <strong class="text-dark">High-speed Wi-Fi Included</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="p-3 bg-light rounded-3 border">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="p-2 rounded-circle bg-warning-subtle text-warning">
+                    <i class="fa-solid fa-utensils fs-5"></i>
+                  </div>
+                  <div>
+                    <span class="small text-muted d-block">Dining</span>
+                    <strong class="text-dark">Complimentary Morning Breakfast</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Related Packages in Destination -->
+        {% if related_packages %}
+          <div class="mb-4">
+            <h4 class="fw-bold text-dark mb-3">Tour Packages Including {{ hotel.destination.name }}</h4>
+            <div class="row g-3">
+              {% for pkg in related_packages %}
+                <div class="col-md-6">
+                  <div class="card border-0 shadow-sm rounded-3 p-3 bg-white h-100 d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <span class="badge bg-light text-muted border">{{ pkg.duration }}</span>
+                      <span class="fw-bold text-primary">&#8377; {{ pkg.base_price|floatformat:0 }}</span>
+                    </div>
+                    <h6 class="fw-bold mb-1">
+                      <a href="{% url 'package_detail' pkg.id %}" class="text-dark text-decoration-none">
+                        {{ pkg.name }}
+                      </a>
+                    </h6>
+                    <p class="text-muted small mb-3 flex-grow-1">{{ pkg.description|truncatewords:14 }}</p>
+                    <a href="{% url 'package_detail' pkg.id %}" class="btn btn-outline-tms btn-sm mt-auto">
+                      Calculate Package Cost with this Hotel <i class="fa-solid fa-arrow-right ms-1"></i>
+                    </a>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Sidebar Pricing & Selection Info -->
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white sticky-top" style="top: 100px;">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <span class="badge bg-success-subtle text-success fw-bold px-3 py-1 rounded-pill">
+              <i class="fa-solid fa-circle-check me-1"></i> Verified Property
+            </span>
+            <span class="text-muted small font-monospace">#HTL-{{ hotel.id|stringformat:"04d" }}</span>
+          </div>
+
+          <div class="mb-3">
+            <span class="text-muted small d-block">Room Surcharge / Night</span>
+            <div class="d-flex align-items-baseline gap-1">
+              <span class="display-6 fw-bold text-primary font-heading">&#8377; {{ hotel.price_per_night|floatformat:0 }}</span>
+              <span class="text-muted small">/ room / night</span>
+            </div>
+            <small class="text-muted d-block mt-1">
+              *Calculated automatically based on number of nights and rooms needed (ceil(persons/2)).
+            </small>
+          </div>
+
+          <hr class="my-3">
+
+          <ul class="list-unstyled mb-4">
+            <li class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted small"><i class="fa-solid fa-location-dot me-2 text-primary"></i> Destination</span>
+              <span class="fw-semibold text-dark small">{{ hotel.destination.name }}</span>
+            </li>
+            <li class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted small"><i class="fa-solid fa-award me-2 text-warning"></i> Tier Category</span>
+              <span class="fw-semibold text-dark small">{{ hotel.get_tier_display }}</span>
+            </li>
+            <li class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted small"><i class="fa-solid fa-door-open me-2 text-success"></i> Available Rooms</span>
+              <span class="fw-semibold text-dark small">{{ hotel.available_rooms }} Rooms</span>
+            </li>
+            <li class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted small"><i class="fa-solid fa-clock me-2 text-info"></i> Check-in / Out</span>
+              <span class="fw-semibold text-dark small">12:00 PM / 11:00 AM</span>
+            </li>
+          </ul>
+
+          <div class="p-3 bg-light rounded-3 mb-3 border">
+            <h6 class="fw-bold text-dark mb-1"><i class="fa-solid fa-calculator text-primary me-1"></i> How To Book</h6>
+            <p class="small text-muted mb-0">
+              Hotels are selected directly inside our <strong>Dynamic Cost Calculator</strong> when customizing any tour package in {{ hotel.destination.name }}.
+            </p>
+          </div>
+
+          <a href="{% url 'package_list' %}?destination={{ hotel.destination.id }}" class="btn btn-primary-tms w-100 py-3 fw-bold rounded-3 mb-2">
+            <i class="fa-solid fa-suitcase-rolling me-1"></i> Browse {{ hotel.destination.name }} Packages
+          </a>
+
+          <a href="{% url 'hotel_list' %}" class="btn btn-outline-secondary w-100 rounded-3 btn-sm">
+            <i class="fa-solid fa-arrow-left me-1"></i> Back to Hotel Catalog
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ vehicle.name }} | Fleet Details | Tourism Management System{% endblock %}
+
+{% block content %}
+<!-- Header Banner -->
+<section class="catalog-header-banner">
+  <div class="container position-relative">
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-white-50 text-decoration-none"><i class="fa-solid fa-house-chimney me-1"></i> Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'vehicle_list' %}" class="text-white-50 text-decoration-none">Vehicles</a></li>
+        <li class="breadcrumb-item active text-white text-truncate max-w-sm" aria-current="page">{{ vehicle.name }}</li>
+      </ol>
+    </nav>
+
+    <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+      <span class="badge bg-primary text-white fw-bold px-3 py-1 rounded-pill">
+        <i class="fa-solid fa-car me-1"></i> {{ vehicle.get_vehicle_type_display }}
+      </span>
+      <span class="badge bg-white-10 text-info fw-semibold px-3 py-1 rounded-pill" style="background: rgba(255,255,255,0.15);">
+        <i class="fa-solid fa-users me-1"></i> {{ vehicle.seating_capacity }} Passenger Seats
+      </span>
+      <span class="badge bg-white-10 text-white-50 px-3 py-1 rounded-pill" style="background: rgba(255,255,255,0.15);">
+        <i class="fa-solid fa-gas-pump me-1"></i> Verified Commercial Permit
+      </span>
+    </div>
+
+    <h1 class="text-white fw-bold display-5 mb-2">{{ vehicle.name }}</h1>
+    <p class="text-white-50 fs-5 mb-0">
+      Available for all customized tour itineraries, airport transfers, and local destination sightseeing.
+    </p>
+  </div>
+</section>
+
+<!-- Content Section -->
+<section class="py-5">
+  <div class="container">
+    <div class="row g-4">
+      <!-- Main Details Column -->
+      <div class="col-lg-8">
+        <!-- Overview Card -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+          <h3 class="fw-bold mb-3 text-dark">Vehicle Overview</h3>
+          <p class="text-muted leading-relaxed mb-4" style="font-size: 1.05rem; white-space: pre-line;">
+            {{ vehicle.description|default:"Top-condition passenger vehicle equipped with high-comfort seats, dual-zone air conditioning, ample boot space, and an experienced government-certified driver." }}
+          </p>
+
+          <h5 class="fw-bold text-dark mb-3">Vehicle Specifications & Travel Comfort</h5>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="p-3 bg-light rounded-3 border">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="p-2 rounded-circle bg-primary-subtle text-primary">
+                    <i class="fa-solid fa-users fs-5"></i>
+                  </div>
+                  <div>
+                    <span class="small text-muted d-block">Passenger Capacity</span>
+                    <strong class="text-dark">{{ vehicle.seating_capacity }} Persons Max</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="p-3 bg-light rounded-3 border">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="p-2 rounded-circle bg-info-subtle text-info">
+                    <i class="fa-solid fa-snowflake fs-5"></i>
+                  </div>
+                  <div>
+                    <span class="small text-muted d-block">Climate Control</span>
+                    <strong class="text-dark">Air-Conditioned Cabin</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="p-3 bg-light rounded-3 border">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="p-2 rounded-circle bg-warning-subtle text-warning">
+                    <i class="fa-solid fa-suitcase-rolling fs-5"></i>
+                  </div>
+                  <div>
+                    <span class="small text-muted d-block">Luggage Capacity</span>
+                    <strong class="text-dark">Standard Luggage Space</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="p-3 bg-light rounded-3 border">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="p-2 rounded-circle bg-success-subtle text-success">
+                    <i class="fa-solid fa-user-tie fs-5"></i>
+                  </div>
+                  <div>
+                    <span class="small text-muted d-block">Chauffeur Service</span>
+                    <strong class="text-dark">Professional Driver Included</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tariff Guidelines Card -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+          <h4 class="fw-bold text-dark mb-3">Rental & Tariff Policies</h4>
+          <ul class="list-unstyled mb-0">
+            <li class="py-2 border-bottom d-flex align-items-start gap-2">
+              <i class="fa-solid fa-circle-check text-success mt-1"></i>
+              <span class="text-muted">Calculated per day of itinerary duration (Rate per day &times; Number of days).</span>
+            </li>
+            <li class="py-2 border-bottom d-flex align-items-start gap-2">
+              <i class="fa-solid fa-circle-check text-success mt-1"></i>
+              <span class="text-muted">Fuel charges, driver allowances, and state border toll taxes included in final quote.</span>
+            </li>
+            <li class="py-2 d-flex align-items-start gap-2">
+              <i class="fa-solid fa-circle-check text-success mt-1"></i>
+              <span class="text-muted">Validated against group size during tour cost calculation so all passengers travel comfortably.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Pricing Sidebar -->
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white sticky-top" style="top: 100px;">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <span class="badge bg-success-subtle text-success fw-bold px-3 py-1 rounded-pill">
+              <i class="fa-solid fa-circle-check me-1"></i> Active Fleet
+            </span>
+            <span class="text-muted small font-monospace">#VEH-{{ vehicle.id|stringformat:"04d" }}</span>
+          </div>
+
+          <div class="mb-3">
+            <span class="text-muted small d-block">Daily Rental Tariff</span>
+            <div class="d-flex align-items-baseline gap-1">
+              <span class="display-6 fw-bold text-primary font-heading">&#8377; {{ vehicle.rate_per_day|floatformat:0 }}</span>
+              <span class="text-muted small">/ day</span>
+            </div>
+            <small class="text-muted d-block mt-1">
+              *Applied for each calendar day of your chosen tour package.
+            </small>
+          </div>
+
+          <hr class="my-3">
+
+          <ul class="list-unstyled mb-4">
+            <li class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted small"><i class="fa-solid fa-car-side me-2 text-primary"></i> Category</span>
+              <span class="fw-semibold text-dark small">{{ vehicle.get_vehicle_type_display }}</span>
+            </li>
+            <li class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted small"><i class="fa-solid fa-users me-2 text-info"></i> Max Capacity</span>
+              <span class="fw-semibold text-dark small">{{ vehicle.seating_capacity }} Passengers</span>
+            </li>
+            <li class="d-flex justify-content-between py-2 border-bottom">
+              <span class="text-muted small"><i class="fa-solid fa-shield-check me-2 text-success"></i> Insurance</span>
+              <span class="fw-semibold text-dark small">Comprehensive Included</span>
+            </li>
+          </ul>
+
+          <div class="p-3 bg-light rounded-3 mb-3 border">
+            <h6 class="fw-bold text-dark mb-1"><i class="fa-solid fa-calculator text-primary me-1"></i> How To Select</h6>
+            <p class="small text-muted mb-0">
+              Select <strong>{{ vehicle.name }}</strong> in our <strong>Dynamic Cost Calculator</strong> when browsing any tour package.
+            </p>
+          </div>
+
+          <a href="{% url 'package_list' %}" class="btn btn-primary-tms w-100 py-3 fw-bold rounded-3 mb-2">
+            <i class="fa-solid fa-suitcase-rolling me-1"></i> Browse Tour Packages
+          </a>
+
+          <a href="{% url 'vehicle_list' %}" class="btn btn-outline-secondary w-100 rounded-3 btn-sm">
+            <i class="fa-solid fa-arrow-left me-1"></i> Back to Fleet Catalog
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

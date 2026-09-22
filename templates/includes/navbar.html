@@ -1,0 +1,84 @@
+<nav class="navbar navbar-expand-lg navbar-tms sticky-top">
+  <div class="container">
+    <a class="navbar-brand" href="{% url 'home' %}">
+      <div class="brand-icon-box">
+        <i class="fa-solid fa-earth-asia"></i>
+      </div>
+      <span>Tour<span class="text-primary">MS</span></span>
+    </a>
+    
+    <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarMain">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3">
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}"><i class="fa-solid fa-house-chimney me-1 text-muted"></i> Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if 'destination' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'destination_list' %}"><i class="fa-solid fa-map-location-dot me-1 text-muted"></i> Destinations</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if 'package' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'package_list' %}"><i class="fa-solid fa-suitcase-rolling me-1 text-muted"></i> Tour Packages</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if 'hotel' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'hotel_list' %}"><i class="fa-solid fa-hotel me-1 text-muted"></i> Hotels</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link {% if 'vehicle' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'vehicle_list' %}"><i class="fa-solid fa-car me-1 text-muted"></i> Vehicles</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'home' %}#features"><i class="fa-solid fa-wand-magic-sparkles me-1 text-muted"></i> How It Works</a>
+        </li>
+      </ul>
+
+      <div class="d-flex align-items-center gap-2">
+        {% if user.is_authenticated %}
+          <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center gap-2 py-2 px-3 rounded-3" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              {% if user.profile.profile_image %}
+                <img src="{{ user.profile.profile_image.url }}" alt="{{ user.username }}" class="rounded-circle" style="width: 24px; height: 24px; object-fit: cover;">
+              {% else %}
+                <i class="fa-solid fa-circle-user text-primary fs-5"></i>
+              {% endif %}
+              <span class="fw-semibold">{{ user.first_name|default:user.username }}</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 py-2 mt-2">
+              <li>
+                <div class="px-3 py-2 border-bottom mb-1">
+                  <div class="fw-bold text-dark">{{ user.get_full_name|default:user.username }}</div>
+                  <small class="text-muted text-truncate d-block" style="max-width: 180px;">{{ user.email }}</small>
+                </div>
+              </li>
+              <li><a class="dropdown-item py-2" href="{% url 'dashboard' %}"><i class="fa-solid fa-gauge-high me-2 text-primary"></i> Customer Dashboard</a></li>
+              <li><a class="dropdown-item py-2" href="{% url 'profile' %}"><i class="fa-solid fa-id-card me-2 text-primary"></i> My Profile</a></li>
+              <li><a class="dropdown-item py-2" href="{% url 'my_bookings' %}"><i class="fa-solid fa-ticket me-2 text-primary"></i> My Bookings</a></li>
+              {% if user.is_staff %}
+                <li><hr class="dropdown-divider"></li>
+                <li><h6 class="dropdown-header text-uppercase text-danger fs-xs">Administration</h6></li>
+                <li><a class="dropdown-item py-2" href="/admin/"><i class="fa-solid fa-database me-2 text-secondary"></i> Django Admin</a></li>
+              {% endif %}
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <form method="post" action="{% url 'logout' %}" class="d-inline">
+                  {% csrf_token %}
+                  <button type="submit" class="dropdown-item py-2 text-danger">
+                    <i class="fa-solid fa-arrow-right-from-bracket me-2"></i> Log Out
+                  </button>
+                </form>
+              </li>
+            </ul>
+          </div>
+        {% else %}
+          <a href="{% url 'login' %}" class="btn btn-outline-tms">
+            <i class="fa-solid fa-arrow-right-to-bracket me-1"></i> Sign In
+          </a>
+          <a href="{% url 'register' %}" class="btn btn-primary-tms">
+            <i class="fa-solid fa-user-plus me-1"></i> Register
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</nav>

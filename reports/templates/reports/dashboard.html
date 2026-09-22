@@ -1,0 +1,128 @@
+{% extends 'reports/base_admin.html' %}
+
+{% block title %}Dashboard Overview{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-4 border-bottom">
+    <h1 class="h2">Dashboard Overview</h1>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3 mb-4">
+        <div class="card shadow-sm h-100 card-stat card-stat-primary">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-2">Total Revenue</h6>
+                        <h3 class="mb-0">₹{{ total_revenue|floatformat:2 }}</h3>
+                    </div>
+                    <div class="icon-lg text-primary">
+                        <i class="fas fa-rupee-sign"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card shadow-sm h-100 card-stat card-stat-success">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-2">Total Bookings</h6>
+                        <h3 class="mb-0">{{ total_bookings }}</h3>
+                    </div>
+                    <div class="icon-lg text-success">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card shadow-sm h-100 card-stat card-stat-warning">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-2">Pending Bookings</h6>
+                        <h3 class="mb-0">{{ pending_bookings }}</h3>
+                    </div>
+                    <div class="icon-lg text-warning">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card shadow-sm h-100 card-stat">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-2">Total Customers</h6>
+                        <h3 class="mb-0">{{ total_customers }}</h3>
+                    </div>
+                    <div class="icon-lg text-info">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Booking Status Breakdown</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
+                    <span class="text-muted">Confirmed Bookings</span>
+                    <span class="badge bg-success rounded-pill fs-6">{{ confirmed_bookings }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
+                    <span class="text-muted">Pending Bookings</span>
+                    <span class="badge bg-warning rounded-pill fs-6">{{ pending_bookings }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
+                    <span class="text-muted">Completed Bookings</span>
+                    <span class="badge bg-primary rounded-pill fs-6">{{ completed_bookings }}</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span class="text-muted">Cancelled Bookings</span>
+                    <span class="badge bg-danger rounded-pill fs-6">{{ cancelled_bookings }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Catalog Summary</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6 mb-4">
+                        <h3 class="text-primary mb-1">{{ total_destinations }}</h3>
+                        <span class="text-muted">Destinations</span>
+                    </div>
+                    <div class="col-6 mb-4">
+                        <h3 class="text-success mb-1">{{ total_packages }}</h3>
+                        <span class="text-muted">Tour Packages</span>
+                    </div>
+                    <div class="col-6">
+                        <h3 class="text-info mb-1">{{ total_hotels }}</h3>
+                        <span class="text-muted">Hotels</span>
+                    </div>
+                    <div class="col-6">
+                        <h3 class="text-warning mb-1">{{ total_vehicles }}</h3>
+                        <span class="text-muted">Vehicles</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

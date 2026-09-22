@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Bookings | Tourism Management System{% endblock %}
+
+{% block content %}
+<div class="container py-5 my-2">
+  <div class="d-flex justify-content-between align-items-end mb-4 border-bottom pb-3">
+    <div>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1">
+          <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-decoration-none">Home</a></li>
+          <li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none">Dashboard</a></li>
+          <li class="breadcrumb-item active" aria-current="page">My Bookings</li>
+        </ol>
+      </nav>
+      <h2 class="fw-bold mb-0"><i class="fa-solid fa-suitcase-rolling text-primary me-2"></i> My Bookings</h2>
+    </div>
+    
+    <ul class="nav nav-pills gap-2 d-none d-md-flex">
+      <li class="nav-item">
+        <a class="nav-link rounded-pill {% if active_filter == 'all' or not active_filter %}active{% else %}bg-light text-dark{% endif %}" href="?filter=all">All Bookings</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link rounded-pill {% if active_filter == 'upcoming' %}active{% else %}bg-light text-dark{% endif %}" href="?filter=upcoming">Upcoming</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link rounded-pill {% if active_filter == 'past' %}active{% else %}bg-light text-dark{% endif %}" href="?filter=past">Past Trips</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link rounded-pill {% if active_filter == 'cancelled' %}active bg-danger border-danger{% else %}bg-light text-dark{% endif %}" href="?filter=cancelled">Cancelled</a>
+      </li>
+    </ul>
+    
+    <div class="dropdown d-md-none">
+      <button class="btn btn-outline-secondary dropdown-toggle rounded-3" type="button" id="statusFilter" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="fa-solid fa-filter me-1"></i> Filter: {{ active_filter|title|default:"All" }}
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="statusFilter">
+        <li><a class="dropdown-item {% if active_filter == 'all' or not active_filter %}active{% endif %}" href="?filter=all">All Bookings</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item {% if active_filter == 'upcoming' %}active{% endif %}" href="?filter=upcoming">Upcoming</a></li>
+        <li><a class="dropdown-item {% if active_filter == 'past' %}active{% endif %}" href="?filter=past">Past Trips</a></li>
+        <li><a class="dropdown-item {% if active_filter == 'confirmed' %}active{% endif %}" href="?filter=confirmed">Confirmed Only</a></li>
+        <li><a class="dropdown-item {% if active_filter == 'cancelled' %}active{% endif %}" href="?filter=cancelled">Cancelled</a></li>
+      </ul>
+    </div>
+  </div>
+
+  {% if bookings %}
+    <div class="row g-4">
+      {% for booking in bookings %}
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden position-relative">
+            
+            {% if booking.status == 'confirmed' %}
+              <div class="position-absolute top-0 end-0 bg-success text-white px-3 py-1 rounded-bl-4 shadow-sm" style="border-bottom-left-radius: 12px; z-index: 2; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;">
+                Confirmed
+              </div>
+            {% elif booking.status == 'pending' %}
+              <div class="position-absolute top-0 end-0 bg-warning text-dark px-3 py-1 rounded-bl-4 shadow-sm" style="border-bottom-left-radius: 12px; z-index: 2; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;">
+                Pending
+              </div>
+            {% elif booking.status == 'cancelled' %}
+              <div class="position-absolute top-0 end-0 bg-danger text-white px-3 py-1 rounded-bl-4 shadow-sm" style="border-bottom-left-radius: 12px; z-index: 2; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;">
+                Cancelled
+              </div>
+            {% elif booking.status == 'completed' %}
+              <div class="position-absolute top-0 end-0 bg-secondary text-white px-3 py-1 rounded-bl-4 shadow-sm" style="border-bottom-left-radius: 12px; z-index: 2; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;">
+                Completed
+              </div>
+            {% endif %}
+
+            <div class="card-img-top position-relative" style="height: 160px; overflow: hidden;">
+              {% if booking.package.image %}
+                <img src="{{ booking.package.image.url }}" class="w-100 h-100" style="object-fit: cover;" alt="{{ booking.package.name }}">
+              {% else %}
+                <div class="w-100 h-100 bg-secondary d-flex align-items-center justify-content-center text-white">
+                  <i class="fa-solid fa-image fs-1 opacity-50"></i>
+                </div>
+              {% endif %}
+              <div class="position-absolute bottom-0 start-0 w-100 p-3" style="background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);">
+                <h5 class="text-white fw-bold mb-0 text-truncate">{{ booking.package.name }}</h5>
+                <p class="text-white-50 small mb-0"><i class="fa-solid fa-location-dot me-1"></i> {{ booking.package.destination.name }}</p>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <div class="d-flex justify-content-between mb-3">
+                <span class="text-muted small font-monospace">{{ booking.booking_reference }}</span>
+                <span class="text-muted small">{{ booking.created_at|date:"M d, Y" }}</span>
+              </div>
+              
+              <ul class="list-unstyled mb-4">
+                <li class="d-flex align-items-center mb-2">
+                  <i class="fa-regular fa-calendar text-primary me-2" style="width: 16px;"></i>
+                  <span class="small">{{ booking.start_date|date:"M d" }} &ndash; {{ booking.end_date|date:"M d, Y" }}</span>
+                </li>
+                <li class="d-flex align-items-center mb-2">
+                  <i class="fa-solid fa-users text-primary me-2" style="width: 16px;"></i>
+                  <span class="small">{{ booking.persons }} Person{{ booking.persons|pluralize }}</span>
+                </li>
+                <li class="d-flex align-items-center">
+                  <i class="fa-solid fa-indian-rupee-sign text-primary me-2" style="width: 16px;"></i>
+                  <span class="small fw-bold text-dark">&#8377;{{ booking.grand_total|floatformat:0 }}</span>
+                </li>
+              </ul>
+              
+              <a href="{% url 'booking_detail' booking.booking_reference %}" class="btn btn-outline-primary w-100 rounded-3 btn-sm fw-semibold">
+                View Details <i class="fa-solid fa-arrow-right ms-1"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="text-center py-5 bg-light rounded-4 border border-dashed">
+      <div class="d-inline-flex align-items-center justify-content-center bg-white text-muted rounded-circle shadow-sm mb-3" style="width: 80px; height: 80px; font-size: 2rem;">
+        <i class="fa-solid fa-folder-open"></i>
+      </div>
+      <h4 class="fw-bold text-dark">No Bookings Found</h4>
+      <p class="text-muted">You haven't made any bookings yet or none match your filter.</p>
+      <a href="{% url 'package_list' %}" class="btn btn-primary-tms px-4 py-2 rounded-3 mt-2">
+        <i class="fa-solid fa-compass me-1"></i> Explore Tours
+      </a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
