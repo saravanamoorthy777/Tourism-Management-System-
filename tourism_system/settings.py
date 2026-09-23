@@ -16,7 +16,7 @@ load_dotenv(BASE_DIR / '.env')
 
 # Quick-start development settings - unsuitable for production
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-tms-secret-key-replace-in-production-2026!@#')
-ALLOWED_HOSTS = [host.strip() for host in os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',') if host.strip()]
+ALLOWED_HOSTS = [host.strip() for host in os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,tourism-management-systemcom.vercel.app,sktouristbookingsystemcom.vercel.app').split(',') if host.strip()]
 DEBUG = os.getenv("DEBUG", "True").lower() == "true"
 
 if DEBUG:
@@ -24,7 +24,7 @@ if DEBUG:
 
 ALLOWED_HOSTS = list(set(ALLOWED_HOSTS))
 
-CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in os.getenv('CSRF_TRUSTED_ORIGINS', 'http://localhost,http://127.0.0.1').split(',') if origin.strip()]
+CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in os.getenv('CSRF_TRUSTED_ORIGINS', 'http://localhost,http://127.0.0.1,https://tourism-management-systemcom.vercel.app,https://sktouristbookingsystemcom.vercel.app').split(',') if origin.strip()]
 
 # Application definition
 INSTALLED_APPS = [
