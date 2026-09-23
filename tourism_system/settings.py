@@ -100,8 +100,10 @@ if 'mysql' in DB_ENGINE:
         if not USE_SQLITE_FALLBACK:
             raise db_err
         # Graceful fallback so development server runs immediately
-        print(f"\n[INFO] MySQL connection to {DB_HOST}:{DB_PORT} could not be established: {db_err}")
-        print("[INFO] Operating in SQLite mode. Once XAMPP MySQL is active, update .env to switch automatically.\n")
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.info(f"MySQL connection to {DB_HOST}:{DB_PORT} could not be established: {db_err}")
+        logger.info("Operating in SQLite mode. Once XAMPP MySQL is active, update .env to switch automatically.")
 
 if is_mysql_active:
     DATABASES = {

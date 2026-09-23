@@ -69,7 +69,9 @@ def _apply_mysql55_compat_patches():
         original_data_types["TimeField"] = "time"
         DatabaseWrapper._data_types = original_data_types
 
-        print(
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.warning(
             "[TMS-COMPAT] MySQL 5.5 shims active: version spoofed to 8.0.11, "
             "datetime(6)/time(6) downgraded to datetime/time. "
             "Upgrade MySQL to 8.0+ and remove tourism_system/__init__.py shim."

@@ -630,3 +630,144 @@ h1, h2, h3, h4, h5, h6, .brand-font {
   box-shadow: var(--shadow-lg);
 }
 
+/* ===================================================================
+   EXPLORE BY CATEGORY UI (PHASE 8 ENHANCEMENT)
+   =================================================================== */
+
+.category-card {
+  transition: var(--transition-smooth);
+}
+
+.category-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-hover) !important;
+}
+
+.category-img-wrapper {
+  overflow: hidden;
+}
+
+.category-img-wrapper img {
+  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.category-card:hover .category-img-wrapper img {
+  transform: scale(1.08);
+}
+
+.hover-bg-light {
+  transition: background-color 0.2s ease;
+}
+
+.hover-bg-light:hover {
+  background-color: #f1f5f9 !important;
+}
+
+.category-btn-details {
+  transition: all 0.2s ease;
+}
+
+.category-btn-details:hover {
+  background-color: var(--primary-blue);
+  color: white !important;
+  border-color: var(--primary-blue) !important;
+}
+
+.dest-item-hover {
+  transition: all 0.2s ease;
+}
+
+.dest-item-hover:hover {
+  background-color: #ffffff !important;
+  border-color: var(--primary-blue) !important;
+  transform: translateX(4px);
+  box-shadow: var(--shadow-sm);
+}
+
+.modal-desc-text {
+  font-size: 1rem;
+  line-height: 1.6;
+  font-weight: 500;
+  color: #1e293b;
+  opacity: 1 !important;
+}
+
+/* UI Readability Polish - Typography Enhancements */
+.category-card-title {
+  font-size: 1.15rem;
+  font-weight: 800 !important;
+  color: #0f172a !important;
+  opacity: 1 !important;
+}
+
+.category-card-desc {
+  font-size: 0.95rem;
+  color: #334155 !important;
+  opacity: 1 !important;
+  line-height: 1.5;
+}
+
+.category-card-counts {
+  font-size: 0.85rem;
+  font-weight: 600 !important;
+  color: #334155 !important;
+  opacity: 1 !important;
+}
+
+.category-card-btn {
+  font-size: 0.9rem;
+  font-weight: 700 !important;
+  opacity: 1 !important;
+}
+
+.badge-category {
+  font-size: 0.8rem;
+  font-weight: 700 !important;
+  opacity: 1 !important;
+}
+
+.modal-hero-title {
+  font-size: 1.5rem;
+  font-weight: 800 !important;
+  color: #ffffff !important;
+  opacity: 1 !important;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.45) !important;
+}
+
+.modal-section-title {
+  font-size: 1.05rem;
+  font-weight: 800 !important;
+  color: #0f172a !important;
+  opacity: 1 !important;
+}
+
+.modal-box-label {
+  font-size: 0.85rem;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+  opacity: 1 !important;
+}
+
+.modal-box-value {
+  font-size: 1.05rem;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+  opacity: 1 !important;
+}
+
+.modal-dest-name {
+  font-size: 0.95rem;
+  font-weight: 600 !important;
+  color: #0f172a !important;
+  opacity: 1 !important;
+}
+
+@media (max-width: 768px) {
+  .category-card-title {
+    font-size: 1.05rem;
+  }
+  .modal-hero-title {
+    font-size: 1.25rem;
+  }
+}
+

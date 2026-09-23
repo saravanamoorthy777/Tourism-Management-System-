@@ -114,18 +114,146 @@
     <div class="row g-4">
       {% for cat in categories %}
         <div class="col-md-6 col-lg-3">
-          <a href="{% url 'destination_list' %}?category={{ cat.slug }}" class="text-decoration-none">
-            <div class="feature-card text-center">
-              <div class="feature-icon-wrapper {% if cat.slug == 'adventure' %}bg-adventure{% elif cat.slug == 'heritage' %}bg-heritage{% elif cat.slug == 'beach' %}bg-beach{% elif cat.slug == 'wildlife' %}bg-wildlife{% else %}bg-primary-subtle text-primary{% endif %} mx-auto">
-                <i class="fa-solid {{ cat.icon }}"></i>
+          <div class="category-card shadow-sm rounded-4 overflow-hidden position-relative h-100 d-flex flex-column bg-white">
+            <!-- Image Header -->
+            <div class="category-img-wrapper position-relative" style="height: 200px;">
+              {% if cat.image %}
+                <img src="{{ cat.image.url }}" alt="{{ cat.name }}" class="w-100 h-100 object-fit-cover" style="object-fit: cover;">
+              {% else %}
+                <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-light text-secondary">
+                  <i class="fa-solid {{ cat.icon }} fa-4x"></i>
+                </div>
+              {% endif %}
+              <div class="category-img-overlay position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.20) 35%, rgba(0,0,0,0.78) 100%);"></div>
+              <div class="category-badge position-absolute top-0 end-0 m-3 badge bg-white text-dark shadow-sm px-3 py-2 rounded-pill fw-bold badge-category" style="opacity: 1;">
+                <i class="fa-solid {{ cat.icon }} text-primary fs-6 me-1"></i> {{ cat.name }}
               </div>
-              <h4 class="fw-bold mb-2 text-dark">{{ cat.name }}</h4>
-              <p class="text-muted small mb-3">{{ cat.description|truncatewords:14 }}</p>
-              <span class="badge bg-light text-secondary border px-3 py-1 rounded-pill">
-                {{ cat.active_destinations_count }} Destination{{ cat.active_destinations_count|pluralize }} &bull; Explore &rarr;
-              </span>
             </div>
-          </a>
+            
+            <!-- Card Body -->
+            <div class="category-card-body p-4 d-flex flex-column flex-grow-1">
+              <h4 class="fw-bolder mb-2 category-card-title">{{ cat.name }}</h4>
+              <p class="category-card-desc mb-3 flex-grow-1">{{ cat.description|truncatewords:14 }}</p>
+              
+              <div class="d-flex justify-content-between category-card-counts mb-4">
+                <span><i class="fa-solid fa-map-location-dot text-primary me-1 fs-6"></i> {{ cat.active_destinations_count }} Destinations</span>
+                <span><i class="fa-solid fa-suitcase-rolling text-primary me-1 fs-6"></i> {{ cat.active_packages_count }} Packages</span>
+              </div>
+              
+              {% if cat.popular_experiences %}
+              <div class="category-card-desc mb-4 border-start border-primary border-3 ps-2">
+                <span class="fw-bold text-dark">Experiences:</span> {{ cat.popular_experiences|truncatewords:6 }}
+              </div>
+              {% endif %}
+
+              <div class="d-flex gap-2 mt-auto">
+                <button type="button" class="btn btn-light border fw-bold flex-grow-1 category-btn-details category-card-btn" data-bs-toggle="modal" data-bs-target="#categoryModal{{ cat.id }}">
+                  Details
+                </button>
+                <a href="{% url 'destination_list' %}?category={{ cat.slug }}" class="btn btn-primary-tms fw-bold flex-grow-1 category-card-btn">
+                  Explore &rarr;
+                </a>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Details Modal for {{ cat.name }} -->
+          <div class="modal fade" id="categoryModal{{ cat.id }}" tabindex="-1" aria-labelledby="categoryModalLabel{{ cat.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+              <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+                <!-- Modal Header / Hero -->
+                <div class="modal-header-hero position-relative p-0" style="height: 250px;">
+                  {% if cat.image %}
+                    <img src="{{ cat.image.url }}" alt="{{ cat.name }}" class="w-100 h-100 object-fit-cover" style="object-fit: cover;">
+                  {% else %}
+                    <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-light text-secondary">
+                      <i class="fa-solid {{ cat.icon }} fa-4x"></i>
+                    </div>
+                  {% endif %}
+                  <div class="modal-hero-overlay position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.20) 35%, rgba(0,0,0,0.78) 100%);"></div>
+                  <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3 z-3 bg-dark bg-opacity-75 rounded-circle p-2 shadow" data-bs-dismiss="modal" aria-label="Close"></button>
+                  <div class="position-absolute bottom-0 start-0 p-4 text-white z-2 w-100 modal-hero-text-container">
+                    <span class="badge bg-primary px-3 py-2 rounded-pill mb-2 shadow fw-bold badge-category"><i class="fa-solid {{ cat.icon }} me-1"></i> {{ cat.name }} Theme</span>
+                    <h2 class="fw-bolder mb-0 text-white modal-hero-title" id="categoryModalLabel{{ cat.id }}">{{ cat.name }} Exploration</h2>
+                  </div>
+                </div>
+                
+                <!-- Modal Body -->
+                <div class="modal-body p-4 bg-white modal-custom-body" style="color: #0f172a; opacity: 1;">
+                  <p class="modal-desc-text mb-4">{{ cat.description }}</p>
+                  
+                  <div class="row g-4 mt-2">
+                    <!-- Stats & Info -->
+                    <div class="col-md-7 pe-md-4">
+                      <h5 class="fw-bolder mb-3 pb-2 border-bottom text-dark modal-section-title">Category Insights</h5>
+                      
+                      {% if cat.popular_experiences %}
+                      <div class="mb-4">
+                        <h6 class="fw-bolder text-dark mb-2 modal-box-label"><i class="fa-solid fa-star text-warning me-2 fs-6"></i> Popular Experiences</h6>
+                        <div class="bg-light border rounded-3 p-3 text-dark fw-bold modal-box-value">{{ cat.popular_experiences }}</div>
+                      </div>
+                      {% endif %}
+                      
+                      {% if cat.recommended_for %}
+                      <div class="mb-4">
+                        <h6 class="fw-bolder text-dark mb-2 modal-box-label"><i class="fa-solid fa-users text-info me-2 fs-6"></i> Best For</h6>
+                        <div class="bg-light border rounded-3 p-3 text-dark fw-bold modal-box-value">{{ cat.recommended_for }}</div>
+                      </div>
+                      {% endif %}
+                      
+                      {% if cat.best_suited_activities %}
+                      <div class="mb-4">
+                        <h6 class="fw-bolder text-dark mb-2 modal-box-label"><i class="fa-solid fa-person-running text-success me-2 fs-6"></i> Suited Activities</h6>
+                        <div class="bg-light border rounded-3 p-3 text-dark fw-bold modal-box-value">{{ cat.best_suited_activities }}</div>
+                      </div>
+                      {% endif %}
+                    </div>
+                    
+                    <!-- Destinations & Action -->
+                    <div class="col-md-5">
+                      <div class="bg-primary-subtle text-primary border border-primary rounded-3 p-3 mb-4 shadow-sm">
+                        <div class="d-flex justify-content-between mb-2 border-bottom border-primary pb-2 align-items-center">
+                          <span class="fw-bold modal-box-label text-dark">Active Destinations</span>
+                          <span class="fw-bolder modal-box-value">{{ cat.active_destinations_count }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between pt-1 align-items-center">
+                          <span class="fw-bold modal-box-label text-dark">Tour Packages</span>
+                          <span class="fw-bolder modal-box-value">{{ cat.active_packages_count }}</span>
+                        </div>
+                      </div>
+                      
+                      {% with cat.representative_destinations as rep_destinations %}
+                      {% if rep_destinations %}
+                      <h6 class="fw-bolder text-dark mb-3 modal-section-title">Popular Destinations</h6>
+                      <ul class="list-unstyled">
+                        {% for dest in rep_destinations %}
+                        <li class="mb-3">
+                          <a href="{% url 'destination_detail' dest.id %}" class="text-decoration-none d-flex align-items-center p-2 rounded-3 bg-light border border-secondary border-opacity-25 dest-item-hover text-dark shadow-sm">
+                            <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm border" style="width: 44px; height: 44px;">
+                              <i class="fa-solid fa-location-dot fs-5"></i>
+                            </div>
+                            <span class="fw-bold modal-dest-name">{{ dest.name }}</span>
+                            <i class="fa-solid fa-chevron-right ms-auto text-secondary small"></i>
+                          </a>
+                        </li>
+                        {% endfor %}
+                      </ul>
+                      {% endif %}
+                      {% endwith %}
+                      
+                      <div class="mt-4 pt-3 border-top">
+                        <a href="{% url 'destination_list' %}?category={{ cat.slug }}" class="btn btn-primary-tms w-100 py-3 fw-bolder shadow-sm text-white category-card-btn text-uppercase" style="letter-spacing: 1px; opacity: 1;">
+                          Explore {{ cat.name }} &rarr;
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- End Details Modal -->
+
         </div>
       {% empty %}
         <div class="col-12 text-center text-muted">

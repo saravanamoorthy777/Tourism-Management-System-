@@ -6,9 +6,18 @@ from .models import DestinationCategory, Destination, TourPackage, PackageItiner
 class DestinationCategoryAdmin(admin.ModelAdmin):
     list_display = ('name', 'slug', 'icon', 'is_active', 'get_destination_count', 'created_at')
     list_filter = ('is_active',)
-    search_fields = ('name', 'description')
+    search_fields = ('name', 'description', 'popular_experiences')
     prepopulated_fields = {'slug': ('name',)}
     ordering = ('name',)
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'slug', 'description', 'icon', 'image', 'is_active')
+        }),
+        ('Modal Data (Explore Section)', {
+            'fields': ('popular_experiences', 'recommended_for', 'best_suited_activities'),
+            'classes': ('collapse',)
+        }),
+    )
 
     @admin.display(description="Destinations")
     def get_destination_count(self, obj):

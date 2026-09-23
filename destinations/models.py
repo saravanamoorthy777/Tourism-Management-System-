@@ -16,6 +16,21 @@ class DestinationCategory(models.Model):
         help_text="FontAwesome icon class (e.g., fa-mountain-sun, fa-landmark-dome, fa-umbrella-beach, fa-paw)"
     )
     image = models.ImageField(upload_to='categories/', blank=True, null=True)
+    popular_experiences = models.CharField(
+        max_length=255, 
+        blank=True, 
+        help_text="Comma-separated popular experiences (e.g., Trekking, Rafting)"
+    )
+    recommended_for = models.CharField(
+        max_length=255, 
+        blank=True, 
+        help_text="Target audience (e.g., Adventure lovers, Groups)"
+    )
+    best_suited_activities = models.CharField(
+        max_length=255, 
+        blank=True, 
+        help_text="Key activities suitable for this category"
+    )
     is_active = models.BooleanField(default=True, verbose_name="Active")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -36,6 +51,16 @@ class DestinationCategory(models.Model):
     @property
     def active_destinations_count(self):
         return self.destinations.filter(is_active=True).count()
+
+    @property
+    def active_packages_count(self):
+        # We need to query TourPackage based on destinations belonging to this category
+        from .models import TourPackage
+        return TourPackage.objects.filter(destination__category=self, is_active=True).count()
+
+    @property
+    def representative_destinations(self):
+        return self.destinations.filter(is_active=True).order_by('-id')[:3]
 
 
 class Destination(models.Model):
