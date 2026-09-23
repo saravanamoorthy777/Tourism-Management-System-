@@ -24,6 +24,8 @@ if DEBUG:
 
 ALLOWED_HOSTS = list(set(ALLOWED_HOSTS))
 
+CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in os.getenv('CSRF_TRUSTED_ORIGINS', 'http://localhost,http://127.0.0.1').split(',') if origin.strip()]
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
